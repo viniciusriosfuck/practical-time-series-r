@@ -1,0 +1,120 @@
+---
+title: "Practical Time Series Analysis"
+output: html_notebook
+---
+
+# Week-1
+
+## Regression Model assumptions
+
+When doing a simple regression model, we make the (often reasonable!) 
+assumptions that the errors:
+
+1. are normally distributed and, on average, zero;
+2. all have the same variance (they are homoscedastic), and
+3. are unrelated to each other (they are independent across observations).
+
+
+When
+we find estimates of the slope and intercept using, for example Ordinary Least Squares (OLS),
+we are not really making any distributional assumptions, just taking a cloud of points and finding
+numbers that we call a slope and an intercept that minimize a quality term.
+
+
+If we wish to perform some inferences (confidence intervals, hypothesis tests), then we need to
+make distributional assumptions.
+
+
+# Week-2
+
+## Johnson&Johnson
+
+
+```{r}
+# install.packages("astsa")
+require(astsa)
+plot(jj, type='o',
+main='Johnson&Johnson quaterly earnings per share',
+xlab='Quarters', ylab='Earnings')
+```
+
+## Flu
+
+```{r}
+plot(astsa:: flu,
+main='Monthly pneumonia and influenza deaths in the U.S.',
+xlab='Months', ylab='Deaths per 10,000 people')
+```
+```{r}
+plot(astsa:: globtemp, type='o',
+main='Global mean land-ocean deviations average temperature of 1951-1980',
+xlab='Years', ylab='Temperature deviations')
+```
+
+```{r}
+plot(astsa:: globtempl, type='o',
+main='Global mean land deviations average temperature of 1951-1980',
+xlab='Years', ylab='Temperature deviations')
+```
+
+
+```{r}
+plot(astsa:: star,
+main='The magnitude of a star taken at midnight for 600 consecutive days',
+xlab='Days', ylab='Magnitude')
+```
+
+
+
+(weak) Stationarity
+
+
+1. no systematic changes in the mean (no trend, even partwise)
+2. no systematic changes in variance
+3. no periodic fluctuations (seasonality)
+
+Stochastic process
+
+* random variables
+
+
+Covariance: measure linear dependence between 2 random variables
+
+
+Autocorrelation function (ACF): variable and lagged variable
+
+* weak stationarity
+
+AC coefficient
+$$ -1 \le \rho_k - \frac{\gamma_k}{\gamma_0} \le 1 $$
+
+Estimation of autocorrelation coefficient
+$$ r_k = \frac{c_k}{c_0}  $$
+
+Any time series has correlation 1 with itself, i.e., autocorrelation at lag 0 is 1.
+
+
+Random walk 
+
+White noise: residual
+
+$$ X_t = X_{t-1} + Z(\mathcal{N}(0,1)) $$
+
+Random walk is the accumulation of random deviations from previous steps until the current time.
+
+
+One can obtain a stationary stochastic process from the random walk using the difference operator
+
+
+Moving average:
+
+The current value of the process now is a linear combination of the noises from current and past time steps.
+
+Autocorrelation function of the process cuts off and becomes zero at the order of the process.
+
+Theoretically, it is 0 starting at lag 4. But for a time series, it will be some value which is nonsignificant. 
+
+<!-- 
+New cell: *Ctrl+Alt+I* 
+Preview : *Ctrl+Shift+K* 
+-->
