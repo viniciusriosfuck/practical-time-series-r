@@ -1,34 +1,14 @@
 ---
 title: "Practical Time Series Analysis"
 output: html_notebook
+editor_options: 
+  markdown: 
+    wrap: 72
 ---
 
 # Week-1
 
-## Regression Model assumptions
-
-When doing a simple regression model, we make the (often reasonable!) 
-assumptions that the errors:
-
-1. are normally distributed and, on average, zero;
-2. all have the same variance (they are homoscedastic), and
-3. are unrelated to each other (they are independent across observations).
-
-
-When
-we find estimates of the slope and intercept using, for example Ordinary Least Squares (OLS),
-we are not really making any distributional assumptions, just taking a cloud of points and finding
-numbers that we call a slope and an intercept that minimize a quality term.
-
-
-If we wish to perform some inferences (confidence intervals, hypothesis tests), then we need to
-make distributional assumptions.
-
-
-# Week-2
-
-## Johnson&Johnson
-
+## Datasets
 
 ```{r}
 # install.packages("astsa")
@@ -38,13 +18,12 @@ main='Johnson&Johnson quaterly earnings per share',
 xlab='Quarters', ylab='Earnings')
 ```
 
-## Flu
-
 ```{r}
 plot(astsa:: flu,
 main='Monthly pneumonia and influenza deaths in the U.S.',
 xlab='Months', ylab='Deaths per 10,000 people')
 ```
+
 ```{r}
 plot(astsa:: globtemp, type='o',
 main='Global mean land-ocean deviations average temperature of 1951-1980',
@@ -57,64 +36,720 @@ main='Global mean land deviations average temperature of 1951-1980',
 xlab='Years', ylab='Temperature deviations')
 ```
 
-
 ```{r}
 plot(astsa:: star,
 main='The magnitude of a star taken at midnight for 600 consecutive days',
 xlab='Days', ylab='Magnitude')
 ```
 
+## Notation
 
+-   $\mathrm{E}$: expected value
 
-(weak) Stationarity
+-   $\mu$: average (expected estimation)
 
+-   $\mathrm{V}$, $\mathrm{Var}$ : variance
 
-1. no systematic changes in the mean (no trend, even partwise)
-2. no systematic changes in variance
-3. no periodic fluctuations (seasonality)
+-   $\sigma$: standard error (estimated root squared variance)
 
-Stochastic process
+-   $\rho$: correlation
 
-* random variables
+-   $r$: correlation estimation
 
+-   $\mathrm{cov}$: covariance
 
-Covariance: measure linear dependence between 2 random variables
+-   $k$, $\tau$: lag
 
+-   $IID$, $iid$: independent, identically distributed
 
-Autocorrelation function (ACF): variable and lagged variable
+-   $\mathcal{N}$: normal distribution
 
-* weak stationarity
+-   $\epsilon$: error
 
-AC coefficient
-$$ -1 \le \rho_k - \frac{\gamma_k}{\gamma_0} \le 1 $$
+-   $\mathrm{\gamma}$: autocovariance function
 
-Estimation of autocorrelation coefficient
-$$ r_k = \frac{c_k}{c_0}  $$
+-   $X_t$: discrete
 
-Any time series has correlation 1 with itself, i.e., autocorrelation at lag 0 is 1.
+-   $X(t)$: continuous
 
+## (weak) Stationarity
 
-Random walk 
+1.  no systematic changes in the mean (no trend, not even piecewise)
+2.  no systematic changes in variance
+3.  no periodic fluctuations (seasonality)
 
-White noise: residual
+$$
+\mathrm{E}[\epsilon_i] = 0 \\
+\mathrm{V}[\epsilon_i] = \sigma^2{\epsilon_i} = \text{constant} = \sigma^2 \\
+\mathrm{cov}[\epsilon_i,\epsilon_j] = \sigma\{\epsilon_i, \epsilon_j\} = 0 \quad \forall i \neq j
+$$
 
-$$ X_t = X_{t-1} + Z(\mathcal{N}(0,1)) $$
+## Regression Model assumptions
 
-Random walk is the accumulation of random deviations from previous steps until the current time.
+When we find estimates of the slope and intercept using, for example
+Ordinary Least Squares (OLS), we are not really making any
+distributional assumptions, just taking a cloud of points and finding
+numbers that we call a slope and an intercept that minimize a quality
+term.
 
+If we wish to perform some inferences (confidence intervals, hypothesis
+tests), then we need to make distributional assumptions. Generally, we
+make the (often reasonable!) assumptions that the errors are (weak)
+stationary) and normal distributed, e.g., the errors
 
-One can obtain a stationary stochastic process from the random walk using the difference operator
+1.  are normally distributed and, on average, zero;
+2.  all have the same variance (they are homoscedastic), and
+3.  are unrelated to each other (they are independent across
+    observations).
 
+$$
+\epsilon_i \stackrel{iid}{\sim} \mathcal{N} ( \mu=0, \; \sigma^2 = \text{constant} )
+$$
 
-Moving average:
+## Variance
 
-The current value of the process now is a linear combination of the noises from current and past time steps.
+It measures the "dispersion" for 1 random variable
 
-Autocorrelation function of the process cuts off and becomes zero at the order of the process.
+$$
+\sigma^2 \equiv \mathrm{V}[X] \equiv \mathrm{E}[ (X - \mu_X) (X - \mu_X) ]
+$$
 
-Theoretically, it is 0 starting at lag 4. But for a time series, it will be some value which is nonsignificant. 
+$$
+V[X+Y] = V[X] + V[Y] + 2\;\mathrm{cov}(X,Y) \\
+V[aX] = a^2 V[X]
+$$
 
+## Covariance
+
+A linear dependence measure between 2 random variables
+
+$$
+\mathrm{COV}[X, Y] \equiv \mathrm{E}\left[ (X - \mu_X) (Y - \mu_Y) \right] \\
+\mathrm{COV}[X, Y] = \mathrm{E}\left[ X \cdot Y \right] - \mathrm{E}\left[ X  \right] \mathrm{E}\left[  Y \right]$$
+
+Autocovariance
+
+$$
+\mathrm{COV}[X, X] = \mathrm{E}\left[ (X - \mu_X) (X - \mu_X) \right] = V[X] = \sigma_X^2
+$$
+
+## Correlation
+
+Like an adimensional covariance
+
+$$
+\mathrm{\rho}[X, Y] \equiv \mathrm{E}\left[ \left(\frac{X - \mu_X}{\sigma_X}\right) \left(\frac{Y - \mu_Y}{\sigma_Y}\right) \right]
+$$
+
+## Stochastic process
+
+A collection of random variables that follows a distribution (let's say
+a normal one):
+
+$$
+X_t \sim \mathcal{N} ( \mu, \; \sigma^2 ) 
+$$
+
+An individual trajectory is a realization of a stochastic process, our
+time series.
+
+The set of all possible trajectories is called the ensemble.
+
+## Mean function
+
+$$
+\mu(t) \equiv \mu_t \equiv E[X(t)]
+$$
+
+## Variance function
+
+$$
+\sigma^2(t) \equiv \sigma^2_t \equiv V[X(t)]
+$$
+
+## Autocovariance function
+
+$$
+\gamma(s,t) = \mathrm{Cov}[X_s,X_t] = \mathrm{E}\left[ (X_s - \mu_s) (X_t - \mu_t) \right] 
+$$
+
+In particular
+
+$$
+\gamma(t,t) = \mathrm{E}\left[ (X_t - \mu_t)^2 \right] = \mathrm{V}[X_t] = \sigma_t^2
+$$
+
+For a process with lag k
+
+$$
+\mathrm{COV}[X_t, X_{t+k}] = \mathrm{E}\left[ X_{t} \cdot X_{t+k} \right] - \mathrm{E}\left[ X_{t} \right] \mathrm{E}\left[  X_{t+k} \right]
+$$
+
+## Correlation
+
+## Autocorrelation function (ACF)
+
+variable and lagged variable
+
+-   weak stationarity
+
+AC coefficient $$ -1 \le \rho_k - \frac{\gamma_k}{\gamma_0} \le 1 $$
+
+Estimation of autocorrelation coefficient $$ r_k = \frac{c_k}{c_0}  $$
+
+Any time series has correlation 1 with itself, i.e., autocorrelation at
+lag 0 is 1.
+
+## Weak stationary discrete process
+
+None assumptions about distributions.
+
+1.  Mean function is constant
+2.  Autocovariance function depends only from the lag $\tau$
+3.  From 2, the variance is also constant
+
+$$
+\mu(t) = \mu  \\
+\gamma(t_1,t_2) = \gamma(t_2-t_1) = \gamma(\tau) \\
+\implies \gamma(t,t) = \gamma(\tau=0) = \sigma^2(t) = \sigma^2
+$$
+
+Let's linearly combine the current and a lagged value and compute its
+variance (since the latter is a squared term, it is therefore
+non-negative)
+
+$$
+V[a X (t) + b X (t+\tau)] \geq 0$$
+
+After we apply variance properties
+
+$$
+a^2 V[ X (t) ] + b^2 V[ X (t+\tau) ] + 2 ab \;\mathrm{cov}\left( X(t),X(t+\tau) \right) \geq 0
+$$
+
+For a weak stationary process, the variance is constant
+
+$$
+a^2 \sigma^2 + b^2 \sigma^2 + 2 ab \;\mathrm{cov}\left( X(t),X(t+\tau) \right) \geq 0 
+$$
+
+For $a=b=1$:
+
+$$
+\sigma^2 + \sigma^2 + 2 \;\mathrm{cov}\left( X(t),X(t+\tau) \right)  \geq 0 \\ \sigma^2 +  \mathrm{cov}\left( X(t),X(t+\tau) \right) \geq 0 \\
+\gamma(0) + \gamma(\tau) \geq 0 \\
+\frac{\gamma(0)}{\gamma(0)} + \frac{\gamma(\tau)}{\gamma(0)} \geq 0 \\
+1 + \rho(\tau) \geq 0 \\
+\rho(\tau) \geq -1
+$$
+
+For $a=1,\;b=-1$:
+
+$$
+\sigma^2 + \sigma^2 - 2 \;\mathrm{cov}\left( X(t),X(t+\tau) \right)  \geq 0 \\ \sigma^2 -  \mathrm{cov}\left( X(t),X(t+\tau) \right) \geq 0 \\
+\gamma(0) - \gamma(\tau) \geq 0 \\
+\frac{\gamma(0)}{\gamma(0)} - \frac{\gamma(\tau)}{\gamma(0)} \geq 0 \\
+1 - \rho(\tau) \geq 0 \\
+1 \geq \rho(\tau)
+$$
+
+Therefore
+
+$$ -1 \le \rho(t) \le 1 $$
+
+## Strict stationarity
+
+The joint distribution of the full set of random variables is usually
+unknown.
+
+Joint distribution of $X(t_1), \cdots, X(t_k)$ is the same as the joint
+distribution of $X(t_1+\tau), \cdots, X(t_k+\tau)$
+
+Implications
+
+-   \$\mathcal{N} (X(t_1)) \equiv \\mathcal{N} (X(t_1+\tau)) \$
+
+-   random variables identically distributed (but not necessarily
+    independent)
+
+-   $\mu(t)=\mu$
+
+-   $\sigma^2(t) = \sigma^2$
+
+-   $\gamma(t_1,t_2) = \gamma(t_2-t_1) = \gamma(\tau)$
+
+## White noise
+
+$$ 
+X_t \stackrel{iid}{\sim} \mathcal{N} ( \mu=0, \; \sigma^2 = \text{constant} )
+ $$
+
+Mean function: \$ \mu(t) = \mu = 0 \$
+
+Autocovariance function:
+
+\#TODO: ENTENDER AUTOCOVARIANCE
+
+$$
+    \gamma(t_1,t_2)= 
+\begin{cases}
+    0           & t_1 \neq t_2 \\
+    \sigma^2    & t_1 = t_2
+\end{cases}
+$$
+
+Autocorrelation function:
+
+$$
+    \rho(t_1,t_2)= 
+\begin{cases}
+    0    & t_1 \neq t_2 \\
+    1    & t_1 = t_2
+\end{cases}
+$$
+
+As the mean and variance are constant along the time and there is no
+seasonality, it is a weak stationary process.
+
+## Random walk
+
+$$ X_t = X_{t-1} + Z_t(\mathcal{N}(\mu=0,\sigma^2=1)) $$
+
+Random walk is the accumulation of random deviations from previous steps
+until the current time.
+
+$$ 
+X_1 = Z_1 \\
+X_2 = X_1 + Z_2 = Z_1 + Z_2 \\
+X_3 = X_2 + Z_3 = Z_1 + Z_2 + Z_3
+$$
+
+For random variables, the mean of the sum is the sum of the means:
+
+$$
+\mathrm{E}[X_t] = \mathrm{E}\left[ \sum_{i=1}^{t} Z_i \right] = \sum_{i=1}^{t} \mathrm{E}\left[  Z_i \right] = t \mu
+$$
+
+For independent random variables, the variance of the sum is the sum of
+the variances.
+
+$$
+\mathrm{V}[X_t] = \mathrm{V}\left[ \sum_{i=1}^{t} Z_i \right] = \sum_{i=1}^{t} \mathrm{V}\left[  Z_i \right] = t \sigma^2
+$$
+
+So random walk is not a stationary process, since even when $\mu=0$, its
+variance increase over time
+
+One can obtain a stationary stochastic process from the random walk
+using the difference operator.
+
+## Moving average
+
+The current value of the process now is a linear combination of the
+noises from current and past time steps. Autocorrelation function of the
+process cuts off and becomes zero at the order $q$ of the process.
+
+$$ 
+Z_t \stackrel{iid}{\sim} \mathcal{N} ( E[Z_t]=0, \; V[Z_t]=\sigma_Z^2 )
+ $$
+
+$$ MA(q)\text{ process:}\qquad X_t = \sum_{i=0}^q {\beta_i Z_{t-i}} $$
+
+Mean function
+
+$$
+E[X_t] = \beta_0 E[Z_t] + \beta_1 E[Z_{t-1}] +\cdots+ \beta_q E[Z_{t-q}] = 0
+$$
+
+Variance function
+
+$$
+V[X_t] = \beta_0^2 V[Z_t] + \beta_1^2 V[Z_{t-1}] +\cdots+ \beta_q^2 V[Z_{t-q}] = \sigma_Z^2 \sum_{i=0}^q {\beta_i^2}
+$$
+
+Covariance function, lag k
+
+$$
+\mathrm{cov}[X_t, X_{t+k}] = 
+\mathrm{cov}\left[ 
+\beta_0 Z_t + \beta_1 Z_{t-1} +\cdots+ \beta_q Z_{t-q}, \\
+\qquad \qquad \qquad \qquad \qquad \quad \beta_0 Z_{t+k} + \beta_1 Z_{t+k-1} +\cdots+ \beta_q Z_{t+k-q} \right]
+$$
+
+$$
+\mathrm{COV}[X_t, X_{t+k}] = \mathrm{E}\left[ X_{t} \cdot X_{t+k} \right] - \mathrm{E}\left[ X_{t} \right] \mathrm{E}\left[  X_{t+k} \right]
+$$
+
+As the mean function is zero.
+
+$$
+\mathrm{E}\left[ X_{t} \right] =  \mathrm{E}\left[  X_{t+k} \right] = 0 \implies
+\mathrm{COV}[X_t, X_{t+k}] = \mathrm{E}\left[ X_{t} \cdot X_{t+k} \right]
+$$
+
+$$
+E\left[ \left( 
+\beta_0 Z_t + \beta_1 Z_{t-1} +\cdots+ \beta_q Z_{t-q} \right) \cdot
+\left( \beta_0 Z_{t+k} + \beta_1 Z_{t+k-1} +\cdots+ \beta_q Z_{t+k-q} \right)  \right] \\
+= E\begin{bmatrix}
+\beta_0\beta_0 Z_{t}Z_{t+k} + \beta_0 \beta_1 Z_{t}Z_{t+k-1} +\cdots+ \beta_0\beta_q Z_{t}Z_{t+k-q} \\
++\\
+\beta_1\beta_0 Z_{t-1}Z_{t+k} + \beta_1 \beta_1 Z_{t-1}Z_{t+k-1} +\cdots+ \beta_1\beta_q Z_{t-1}Z_{t+k-q} \\
++\\
+\beta_q\beta_0 Z_{t-q}Z_{t+k} + \beta_q \beta_1 Z_{t-q}Z_{t+k-1} +\cdots+ \beta_q\beta_q Z_{t-q}Z_{t+k-q}
+\end{bmatrix}
+$$
+
+$$
+    \mathrm{E}\left[ Z_{t} \cdot Z_{t+i} \right] =
+\begin{cases}
+    \mathrm{E}\left[ Z_{t} \right] \cdot \mathrm{E}\left[ Z_{t+i} \right] = 0           & t \neq t+i \\
+    \mathrm{E}\left[ Z_{t} \right] \cdot \mathrm{E}\left[ Z_{t} \right] = V[Z_{t}] = \sigma^2    & t = t+i
+\end{cases}
+%= \mathrm{E}\left[ X_{t} \right]  \cdot \mathrm{E}\left[ X_{t+k} \right] =
+$$
+
+For $k=0$, only at the main diagonal we refer to the same instant.
+
+$$
+\mathrm{COV}[X_t, X_{t}] = E\begin{bmatrix}
+\beta_0\beta_0 Z_{t}Z_{t} + 0 +\cdots+ 0 \\
++\\
+0 + \beta_1 \beta_1 Z_{t-1}Z_{t-1} +\cdots+ 0 \\
++\\
+0 + 0 +\cdots+ \beta_q\beta_q Z_{t-q}Z_{t-q}
+\end{bmatrix}
+= \sigma^2 \sum_{i=0}^{q} \beta_i^2
+$$
+
+For $k=1$, only a shift diagonal contains terms at the same instant.
+
+$$
+\mathrm{COV}[X_t, X_{t}] = E\begin{bmatrix}
+0 + \beta_0\beta_1 Z_{t}Z_{t} +\cdots+ 0 \\
++\\
+0 + 0 + \beta_1 \beta_2 Z_{t-1}Z_{t-1} +\cdots+ 0 \\
++\\
+0 + 0 +\cdots+ 0
+\end{bmatrix}
+= \sigma^2 \sum_{i=0}^{q-1} \beta_i\beta_{i+1}
+$$
+
+For $k=q$,
+
+$$
+\mathrm{COV}[X_t, X_{t}] = E\begin{bmatrix}
+0 + 0 +\cdots+ \beta_0\beta_q Z_{t}Z_{t+q-q} \\
++\\
+0 + 0  +\cdots+ 0 \\
++\\
+0 + 0 +\cdots+ 0
+\end{bmatrix}
+= \sigma^2 \beta_0\beta_q
+$$
+
+Generic $k\leq q$, inspecting the coefficients
+
+$$
+\mathrm{cov} [X_t, X_{t+k}] = 
+\mathrm{cov} \left[ \left( 
+\beta_0 Z_t + \beta_1 Z_{t-1} +\cdots+ \beta_q Z_{t-q} \right) \cdot
+\left( \beta_0 Z_{t+k} + \beta_1 Z_{t+k-1} +\cdots+ \beta_q Z_{t+k-q} \right)  \right]
+$$
+
+$$
+\begin{matrix}
+Z_{t-q} & Z_{t-(q-1)} & \cdots & Z_{t-(q-k)} & \cdots & Z_{t-1} & Z_{t} & \cdots & & \\
+\beta_{q} & \beta_{q-1} & \cdots & \beta_{q-k} & \cdots & \beta_{1} & \beta_{0} & \cdots & 0 & 0 \\
+ &  & \cdots & Z_{t+k-q} & \cdots & Z_{t+k-(k+1)} & Z_{t+k-k} & \cdots & Z_{t+k-1} & Z_{t+k} \\
+0 & 0 & \cdots & \beta_{q} & \cdots & \beta_{k+1} & \beta_{k} & \cdots & \beta_{1} & \beta_{0} \\
+\end{matrix}
+$$
+
+$$
+\mathrm{cov} [X_t, X_{t+k}] = \sigma^2 \sum_{i=0}^{q-k}{\beta_i \beta_{i+k}}
+$$
+
+$$
+    \gamma(t_1,t_2) = \gamma(k) =
+\begin{cases}
+    0           & k > q \\
+    \sigma_Z^2 \sum_{i=0}^{q-k}{\beta_i \beta_{i+k}}    & k \leq q
+\end{cases}
+$$
+
+Since the mean function is constant and the autocovariance function does
+not depend on time (it depends only from the lag spacing), the moving
+average is a weak stationary process.
+
+When there is no lag, $k=0$:
+
+$$
+\gamma(k=0) = \sigma_Z^2 \sum_{i=0}^{q}{\beta_i \beta_{i}} 
+$$
+
+Therefore the autocorrelation function is
+
+$$
+\rho(k) = \frac{\gamma(k)}{\gamma(0)} 
+= \frac{\sigma_Z^2 \sum_{i=0}^{q-k}{\beta_i \beta_{i+k}}}{\sigma_Z^2 \sum_{i=0}^{q}{\beta_i \beta_{i}} }
+= \frac{\sum_{i=0}^{q-k}{\beta_i \beta_{i+k}}}{\sum_{i=0}^{q}{\beta_i^2}}
+$$
+
+Theoretically, it is 0 starting at lag 4. But for a time series, it will
+be some value which is non-significant. Blue lines are significance
+level
+
+```{r}
+set.seed(2^10)
+z=NULL
+z=rnorm(1000)
+data=NULL
+for(i in 4:1000){
+  data[i-3]=z[i]+0.2*z[i-1]+0.3*z[i-2]+0.4*z[i-3]
+}
+data=ts(data)
+# find acf below
+# blue lines are significance level
+acf(data)
+```
+
+```{r}
+par( mfrow=c(3,1) );
+plot( arima.sim(n=150, list(order=c(0,0,0) )  ), main="WN" );
+plot( arima.sim(n=150, list(ma=c(0.33, 0.33, 0.33)      )  ) , main="MA3");
+plot( arima.sim(n=150, list(ma=c(0.2, 0.2, 0.2, 0.2, 0.2) )  ), main="MA5" );
+```
+
+I don't get the 0.531 as $\rho(1)$
+
+```{r}
+set.seed=1
+(acf(arima.sim(n=1000, model=list(ma=c(0.5,0.5)))))
+```
+
+## Summary
+
++----------------+-------------+-------------+-------------+-------------+
+| Function       | Mean        | Aut         | Variance    | Stationary  |
+|                |             | ocovariance |             |             |
+| Process        |             |             |             |             |
++================+=============+=============+=============+=============+
+| **Strict s     | constant    | lag         | constant    | Strict      |
+| tationary**    |             | dependent   |             |             |
++----------------+-------------+-------------+-------------+-------------+
+| **Weak s       | constant    | depends     | constant    | Weak        |
+| tationary**    |             | only from   |             |             |
+|                |             | lag         |             |             |
++----------------+-------------+-------------+-------------+-------------+
+| **Random       | p           | p           | **p         | No          |
+| walk**         | roportional | roportional | roportional |             |
+|                | to t        | to t        | to t**      |             |
++----------------+-------------+-------------+-------------+-------------+
+| **White        | constant    | constant    | constant    | Strict /    |
+| noise**        |             |             |             | weak        |
++----------------+-------------+-------------+-------------+-------------+
+| **Moving       |             |             |             | weak        |
+| average**      |             |             |             |             |
++----------------+-------------+-------------+-------------+-------------+
+
+# Week-2
+
+## Autoregressive process
+
+Order p
+
+$$
+X_t=Z_t+history
+$$
+
+White noise
+
+$$
+Z_t\stackrel{iid}{\sim}(\mathcal{N}(\mu=0,\sigma^2=1))
+$$
+
+History
+
+$$
+history = \phi_1 X_{t-1} + \cdots + \phi_p X_{t-p}
+$$
+
+$$
+AR(p): X_t = Z_t + \phi_1 X_{t-1} + \cdots + \phi_p X_{t-p} \\
+MA(q): X_t = \theta_0 Z_{t} + \theta_1 Z_{t-1} + \cdots + \theta_q Z_{t-q}
+$$
+
+MA: finite set of innovations $Z_t$'s
+
+AR: current innovation $Z_t$ and history of a finite set of prior states
+$X_t$'s
+
+### Random walk
+
+$$
+X_t=X_{t-1}+Z_t
+$$
+
+For $p=\phi_1=1$
+
+$$
+X_t=X_{t-1}+Z_t
+$$
+
+```{r}
+set.seed(2016); N=1000; phi = 1;
+Z = rnorm(N,0,1); X=NULL; X[1] = Z[1];
+for (t in 2:N) {
+X[t] = Z[t] + phi*X[t-1] ;
+}
+X.ts = ts(X)
+par(mfrow=c(2,1))
+plot(X.ts,main="AR(1) Time Series on White Noise, phi=1")
+X.acf = acf(X.ts, main="AR(1) Time Series on White Noise, phi=1")
+```
+
+First order AR(1)
+
+```{r}
+set.seed(2016); N=1000; phi = .4;
+Z = rnorm(N,0,1); X=NULL; X[1] = Z[1];
+for (t in 2:N) {
+X[t] = Z[t] + phi*X[t-1] ;
+}
+X.ts = ts(X)
+par(mfrow=c(2,1))
+plot(X.ts,main="AR(1) Time Series on White Noise, phi=.4")
+X.acf = acf(X.ts, main="AR(1) Time Series on White Noise, phi=.4")
+
+(r.coef = X.acf$acf)
+(c (mean(X), var(X)))
+```
+
+```{r}
+for (phi1 in c(0.1, 0.9)) {
+  X.ts <- arima.sim(list(ar = c(phi1)), n=1000)
+  par(mfrow=c(2,1))
+  plot(X.ts,main=paste("AR(1) Time Series, phi1=",phi1))
+  X.acf = acf(X.ts, main="Autocorrelation of AR(1) Time Series")
+}
+```
+
+Second order AR(2)
+
+Coefficients range that assure stationarity
+
+$$
+-1 < \phi_2 <1 \\
+\phi_2 < 1 + \phi_1 \\
+\phi_2 < 1 - \phi_1
+$$
+
+```{r}
+X.ts <- arima.sim(list(ar = c(.7, .2)), n=1000)
+par(mfrow=c(2,1))
+plot(X.ts,main="AR(2) Time Series, phi1=.7, phi2=.2")
+X.acf = acf(X.ts, main="Autocorrelation of AR(2) Time Series")
+```
+
+```{r}
+
+phi1 = .4; phi2 = .3;
+
+par(mfrow=c(2,1))
+X.ts <- arima.sim(list(ar = c(phi1, phi2)), n=1000)
+plot(X.ts,main=paste("AR(2) Time Series, phi1=",phi1,"phi2=",phi2))
+acf(X.ts,main="ACF")
+
+```
+
+## Backshift operator
+
+$$
+AR(p): X_t = Z_t + \phi_1 X_{t-1} + \cdots + \phi_p X_{t-p}
+$$
+
+$$
+X_{t-1} = B^1 X_{t} \\
+X_{t-2} = B^2 X_{t} \\
+\vdots \\
+X_{t-p} = B^p X_{t}
+$$
+
+$$
+X_t = Z_t + \phi_1 B X_{t} + \cdots + \phi_p B^p X_{t} = Z_t + (\phi_1 B  + \cdots + \phi_p B^p) X_{t} \\
+Z_t = (1 - \phi_1 B  - \cdots - \phi_p B^p) X_{t} = \Phi(B) X_t \\
+X_t = \Phi^{-1}(B) Z_t = \frac{1}{\Phi(B)}Z_t \\
+
+X_t = \frac{1}{(1 - \phi_1 B  + \cdots + \phi_p B^p)}Z_t = \frac{1}{1 - ( \phi_1 B  + \cdots + \phi_p B^p )} Z_t
+
+$$
+
+$$
+MA(q\to\infty): X_t = \theta_0 Z_{t} + \theta_1 Z_{t-1} + \cdots + \theta_q Z_{t-q} \\
+ X_t = (1 +  \theta_1 B + \theta_2 B^2 + \cdots ) Z_{t}
+$$
+
+First order
+
+$$
+AR(1): X_t = Z_t + \phi B X_{t} = Z_t + \phi X_{t-1} \\
+X_t = Z_t + \phi ( Z_{t-1} + \phi X_{t-2} = Z_t + \phi X_{t-1} + \phi^2 X_{t-2} \\
+( 1 -  \phi B ) X_{t} = Z_t  \\
+X_t = \frac{1}{( 1 -  \phi B )}Z_t = ( 1 +  \phi B + \phi^2 B^2 + \cdots ) Z_t \\
+X_t = Z_t + \phi Z_{t-1} + \phi^2 Z_{t-2} + \cdots
+
+$$
+
+AR(p), $E[Z_t] = 0, V[Z_t]=\sigma_Z^2$, \$V[aX] = a\^2 V[X] \$
+
+$$
+E[X_t] = E [ ( 1+\theta_1 B + \theta_2 B^2 + \cdots  ) Z_t ] = E [ Z_t ] + \theta_1 E [ Z_{t-1} ] + \cdots + \theta_k E [ Z_{t-k}] + \cdots   = 0
+$$
+
+$$
+V[X_t] = V [ ( 1+\theta_1 B + \theta_2 B^2 + \cdots  ) Z_t ] = V [ Z_t ] + \theta_1^2 V [ Z_{t-1} ] + \cdots + \theta_k^2 V [ Z_{t-k}] + \cdots   = \sigma_Z^2(1+\theta_1^2+\cdots+\theta_k^2+\cdots) = \sigma_Z^2 \sum_{i=0}^{\infty}{\theta_i^2}
+$$
+
+Necessary condition for stationarity. infinite series to converge.
+
+$$
+\sum_{i=0}^{\infty}{ | \theta_i | }
+$$
+
+$$
+MA(q): \gamma(k) = \sigma_Z^2 \sum_{i=0}^{q-k}{\theta_i \theta_{i+k}} \\
+AR(p): \gamma(k) = \sigma_Z^2 \sum_{i=0}^{\infty}{\theta_i \theta_{i+k}}
+$$
+
+$$
+\rho (k) = \phi_1^k
+$$
+
+$$
+\text{White noise}: \phi = 0 \\
+\text{Random walk}: \phi = 1 \\
+\text{Alternating signal correlation}: \phi < 1
+\text{First order stationary}: -1 < \phi < 1
+$$
+
+## Geometric series
+
+$$
+\frac{1}{1-a} = a^0 + a^1 + a^2 + \cdots = \sum_{i=0}^{\infty}a^i, \qquad |a| < 1
+$$
+
+$$
+|a|: 
+\begin{cases}
+<1 & \text{convergent}  & \text{Ex: } a=\frac{1}{2}; & 1 + \frac{1}{2} + \frac{1}{4} + \frac{1}{8} \cdots \to \frac{1}{1-\frac{1}{2}} = 2 \\
+\neq 0 & \text{zero denominator} \\
+>1 & \text{divergent}  & \text{Ex: } a=2; & 1 + 2 + 4 + 8 + \cdots \to \infty \end{cases}
+$$
+
+```{=html}
 <!-- 
 New cell: *Ctrl+Alt+I* 
 Preview : *Ctrl+Shift+K* 
 -->
+```

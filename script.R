@@ -103,11 +103,35 @@ mean(worldcup$Time)
 
 summary(worldcup)
 
-# ----
+
+# Artificial data ----
+data = c(7,  5,  1,  7,  2,  5,  2,  4, 10,  6);
+t.test(data, alternative = "two.sided", paired=FALSE)
+# The p-value is much less that 0.05 
+# so this data set is rather improbable under the null hypothesis. 
+
+
+quiz_data=c(
+  37, 86, 79, 95, 61, 93, 
+  19, 98, 121, 26, 39, 11,
+  26, 75, 29,130, 42, 8)
+
+hist(quiz_data, breaks=10, main='Histogram', xlab='Quiz data')
+
+
+hist(quiz_data, freq=F, breaks=10, main='Histogram', xlab='Quiz data', col='blue')
+lines(density(quiz_data), col='red', lwd=5)
+
+summary(data) # Edit this line
+
+
+
 data.1 = c(35,8,10,23,42)
 summary(data.1)
 mean(data.1)
 sum(data.1)/length(data.1)
+
+
 
 small.size.dataset=c(
   91,49,76,112,97,42,70,100, 8, 112,
@@ -134,17 +158,14 @@ hist(small.size.dataset, xlab='My data points', main='Histogram of my data', fre
 
 hist(small.size.dataset, xlab='My data points', main='Histogram of my data', freq=F, col='green', breaks=10)
 lines(density(small.size.dataset), col='red', lwd=5)
-# ----
+
 
 
 set.seed(2016)  # There is a typo in the video (set.seed=2016)
 
 Test_1_scores=round(rnorm(50, 78, 10))
-
 Test_2_scores=round(rnorm(50, 78, 14))
-
 Test_1_scores # Data won't be the same with the data generated in the video lecture since there was a typo in set.seed. 
-
 Test_2_scores # Data won't be the same with the data generated in the video lecture since there was a typo in set.seed. 
 
 plot(Test_2_scores~Test_1_scores)
@@ -340,23 +361,6 @@ pairs(rock)
 cor(rock)
 
 
-# ----
-
-quiz_data=c(
-  37, 86, 79, 95, 61, 93, 
-  19, 98, 121, 26, 39, 11,
-  26, 75, 29,130, 42, 8)
-
-hist(quiz_data, breaks=10, main='Histogram', xlab='Quiz data')
-
-
-hist(quiz_data, freq=F, breaks=10, main='Histogram', xlab='Quiz data', col='blue')
-lines(density(quiz_data), col='red', lwd=5)
-
-summary(data) # Edit this line
-
-
-
 # cheddar ----
 library(faraway)
 help(cheddar)
@@ -370,14 +374,6 @@ m$coefficients
 sum(m$residuals)
 
 sum(m$fitted.values)
-
-
-# ----
-data = c(7,  5,  1,  7,  2,  5,  2,  4, 10,  6);
-t.test(data, alternative = "two.sided", paired=FALSE)
-# The p-value is much less that 0.05 
-# so this data set is rather improbable under the null hypothesis. 
-
 
 
 
@@ -522,8 +518,7 @@ data=ts(data)
 
 # find acf below
 
-(acf(data, type='covariance'))
-
+# blue lines are significance level
 (acf(data))
 
 
