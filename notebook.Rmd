@@ -530,28 +530,28 @@ set.seed=1
 
 ## Summary
 
-+----------------+-------------+-------------+-------------+-------------+
-| Function       | Mean        | Aut         | Variance    | Stationary  |
-|                |             | ocovariance |             |             |
-| Process        |             |             |             |             |
-+================+=============+=============+=============+=============+
-| **Strict s     | constant    | lag         | constant    | Strict      |
-| tationary**    |             | dependent   |             |             |
-+----------------+-------------+-------------+-------------+-------------+
-| **Weak s       | constant    | depends     | constant    | Weak        |
-| tationary**    |             | only from   |             |             |
-|                |             | lag         |             |             |
-+----------------+-------------+-------------+-------------+-------------+
-| **Random       | p           | p           | **p         | No          |
-| walk**         | roportional | roportional | roportional |             |
-|                | to t        | to t        | to t**      |             |
-+----------------+-------------+-------------+-------------+-------------+
-| **White        | constant    | constant    | constant    | Strict /    |
-| noise**        |             |             |             | weak        |
-+----------------+-------------+-------------+-------------+-------------+
-| **Moving       |             |             |             | weak        |
-| average**      |             |             |             |             |
-+----------------+-------------+-------------+-------------+-------------+
++---------------+------------+------------+------------+------------+
+| Function      | Mean       | Aut o      | Variance   | Stationary |
+|               |            | covariance |            |            |
+| Process       |            |            |            |            |
++===============+============+============+============+============+
+| **Strict s    | constant   | lag        | constant   | Strict     |
+| tationary**   |            | dependent  |            |            |
++---------------+------------+------------+------------+------------+
+| **Weak s      | constant   | depends    | constant   | Weak       |
+| tationary**   |            | only from  |            |            |
+|               |            | lag        |            |            |
++---------------+------------+------------+------------+------------+
+| **Random      | p r        | p r        | **p r      | No         |
+| walk**        | oportional | oportional | oportional |            |
+|               | to t       | to t       | to t**     |            |
++---------------+------------+------------+------------+------------+
+| **White       | constant   | constant   | constant   | Strict /   |
+| noise**       |            |            |            | weak       |
++---------------+------------+------------+------------+------------+
+| **Moving      |            |            |            | weak       |
+| average**     |            |            |            |            |
++---------------+------------+------------+------------+------------+
 
 # Week-2
 
@@ -563,7 +563,7 @@ $$
 X_t=Z_t+history
 $$
 
-White noise
+White noise, innovations, random disturbance
 
 $$
 Z_t\stackrel{iid}{\sim}(\mathcal{N}(\mu=0,\sigma^2=1))
@@ -677,17 +677,32 @@ X_{t-p} = B^p X_{t}
 $$
 
 $$
-X_t = Z_t + \phi_1 B X_{t} + \cdots + \phi_p B^p X_{t} = Z_t + (\phi_1 B  + \cdots + \phi_p B^p) X_{t} \\
-Z_t = (1 - \phi_1 B  - \cdots - \phi_p B^p) X_{t} = \Phi(B) X_t \\
+X_t = Z_t + \phi*1 B X{t} + \cdots + \phi*p B^p \\
+X{t} = Z_t + (\phi_1 B + \cdots + \phi*p B^p) X{t} \\
+Z_t = (1 - \phi_1 B - \cdots - \phi*p B^p) X{t} = \Phi(B) X_t \\
 X_t = \Phi^{-1}(B) Z_t = \frac{1}{\Phi(B)}Z_t \\
-
 X_t = \frac{1}{(1 - \phi_1 B  + \cdots + \phi_p B^p)}Z_t = \frac{1}{1 - ( \phi_1 B  + \cdots + \phi_p B^p )} Z_t
-
 $$
 
 $$
 MA(q\to\infty): X_t = \theta_0 Z_{t} + \theta_1 Z_{t-1} + \cdots + \theta_q Z_{t-q} \\
- X_t = (1 +  \theta_1 B + \theta_2 B^2 + \cdots ) Z_{t}
+ X_t = ( \theta_0 +  \theta_1 B + \theta_2 B^2 + \cdots ) Z_{t}
+$$
+
+MA(q) with a drift
+
+$$
+X_t = \mu +  \theta_0 Z_{t} + \theta_1 Z_{t-1} + \cdots + \theta_q Z_{t-q} \\
+X_t - \mu = \Theta(B) Z_t \\
+\Theta(B) = \theta_0 + \theta_1 B + \cdots +  \theta_q B^q
+$$
+
+Ex:
+
+MA(2):
+
+$$
+X_t = Z_t + 0.2 Z_{t-1} + 0.04 Z_{t-2} = (1+0.2B+0.04B^2)Z_t = \beta(B)Z_t
 $$
 
 First order
@@ -695,10 +710,9 @@ First order
 $$
 AR(1): X_t = Z_t + \phi B X_{t} = Z_t + \phi X_{t-1} \\
 X_t = Z_t + \phi ( Z_{t-1} + \phi X_{t-2} = Z_t + \phi X_{t-1} + \phi^2 X_{t-2} \\
-( 1 -  \phi B ) X_{t} = Z_t  \\
-X_t = \frac{1}{( 1 -  \phi B )}Z_t = ( 1 +  \phi B + \phi^2 B^2 + \cdots ) Z_t \\
+( 1 - \phi B ) X_{t} = Z_t \\
+X_t = \frac{1}{( 1 -  \phi B )}Z_t = ( 1 + \phi B + \phi^2 B^2 + \cdots ) Z_t \\
 X_t = Z_t + \phi Z_{t-1} + \phi^2 Z_{t-2} + \cdots
-
 $$
 
 AR(p), $E[Z_t] = 0, V[Z_t]=\sigma_Z^2$, \$V[aX] = a\^2 V[X] \$
@@ -709,6 +723,15 @@ $$
 
 $$
 V[X_t] = V [ ( 1+\theta_1 B + \theta_2 B^2 + \cdots  ) Z_t ] = V [ Z_t ] + \theta_1^2 V [ Z_{t-1} ] + \cdots + \theta_k^2 V [ Z_{t-k}] + \cdots   = \sigma_Z^2(1+\theta_1^2+\cdots+\theta_k^2+\cdots) = \sigma_Z^2 \sum_{i=0}^{\infty}{\theta_i^2}
+$$
+
+Ex:
+
+AR(2):
+
+$$
+X_t = Z_t + 0.2 X_{t-1} + 0.3 X_{t-2} = Z_t + (0.2B+0.3B^2)X_t \\
+Z_t = (1-0.2B-0.3B^2)X_t = \phi(B)X_t
 $$
 
 Necessary condition for stationarity. infinite series to converge.
@@ -729,8 +752,71 @@ $$
 $$
 \text{White noise}: \phi = 0 \\
 \text{Random walk}: \phi = 1 \\
-\text{Alternating signal correlation}: \phi < 1
+\text{Alternating signal correlation}: \phi < 1\\
 \text{First order stationary}: -1 < \phi < 1
+$$
+
+## Series
+
+Sequence of ordered numbers.
+
+Convergent if $\lim_{n\to\infty}a_n=a$
+
+Ex:
+
+$$
+a_n = \frac{n}{n+1}:\quad \frac{1}{1+1}=\frac{1}{2}, \frac{2}{2+1}=\frac{2}{3}, \cdots \to 1 \\
+a_n = 3^n:\quad 3^1=3, 3^2=9, \cdots \to \infty \\
+a_n = \sqrt{n}:\quad \sqrt{1}=1, \sqrt{2}, \cdots \to \infty \\
+a_n = \frac{1}{n^2}:\quad \frac{1}{1^2}=1, \frac{1}{2^2}=\frac{1}{4}, \cdots \to 0
+$$
+
+Partial sums and convergent series sum
+
+$$
+s_n = \sum_{i=1}^{n} a_i, \quad s = \sum_{i=1}^{\infty} a_i
+$$
+
+Convergent partial sums \$\implies\$ convergent infinite series.
+
+$$
+\sum_{i=1}^{\infty} \frac{1}{2^i} = 1 \\
+\sum_{i=1}^{\infty} \frac{1}{i^2} = \frac{\pi^2}{6} \\
+\sum_{i=1}^{\infty} \frac{(-1)^{i+1}}{i} = \ln(2)
+$$
+
+Divergent
+
+$$
+\sum_{i=1}^{\infty} 3^i \\
+\sum_{i=1}^{\infty} (2i+1) \\
+\sum_{i=1}^{\infty} \frac{1}{i}
+$$
+
+$$
+a_n = \frac{a_1}{1-r} =   \sum_{i=1}^{\infty} a_1 r^{i-1}
+$$
+
+Ex:
+
+$$
+\sum_{i=1}^{\infty} \frac{1}{2^i} = \frac{1}{2^1} + \frac{1}{2^2} + \cdots
+$$
+
+$$
+a_n = \frac{1}{2^i} \\
+a_1 = \frac{1}{2^1} = \frac{1}{2} \\
+r = \frac{a_2}{a_1} = \frac{1}{2^2}\frac{2^1}{1} = \frac{1}{2} \\
+a_1 r^{i-1} = \frac{1}{2} \frac{1}{2^{i-1}} = \frac{1}{2^{i}} \\
+\sum_{i=1}^{\infty} a_1 r^{i-1} = \frac{a_1}{1-r} = \frac{\frac{1}{2}}{1-\frac{1}{2}} = \frac{\frac{1}{2}}{\frac{1}{2}} = 1
+$$
+
+Ex:
+
+Absolute convergence
+
+$$
+\sum_{k=1}^{\infty} | a_k |
 $$
 
 ## Geometric series
@@ -747,9 +833,1975 @@ $$
 >1 & \text{divergent}  & \text{Ex: } a=2; & 1 + 2 + 4 + 8 + \cdots \to \infty \end{cases}
 $$
 
-```{=html}
-<!-- 
-New cell: *Ctrl+Alt+I* 
-Preview : *Ctrl+Shift+K* 
--->
+## Invertibility
+
+-   $X_t$: stochastic process
+
+-   $Z_t$: innovations (random disturbances, white noise)
+
+-   $X_t$: invertible, if $Z_t=\sum_{k=0}^{\infty}\pi_{k}X_{t-k}$, where
+    $\sum_{k=0}^{\infty}|\pi_{k}|$ convergent.
+
+Model 1
+
+$$
+X_t = Z_t + 2 Z_{t-1} \\
+\gamma(k) = cov[X_{t+k},X_t] = cov[Z_{t+k} + 2 Z_{t+k-1},Z_t + 2 Z_{t-1}]
+$$
+
+$$
+k: 
+\begin{cases}
+<0 & \gamma(k<0) = \gamma(-k>0)  \\
+= 0 & \gamma(k=0) = cov[Z_{t} + 2 Z_{t-1},Z_t + 2 Z_{t-1}] = cov[Z_{t}, Z_t] + 2^2 cov[Z_{t-1}, Z_{t-1}] = \sigma_Z^2 + 4 \sigma_Z^2 = 5 \sigma_Z^2 \\
+=1 & \gamma(k=1) = cov[Z_{t+1} + 2 Z_{t}, Z_t + 2 Z_{t-1}] = cov[2 Z_{t}, Z_t] = 2  \sigma_Z^2 \\
+>1 & \gamma(k>1) = 0, \quad \text{since } t+k > t+k-1 > t > t-1 \implies \text{uncorrelated } Z\text{'s}
+\end{cases}
+$$
+
+$$
+\gamma(k) =
+\begin{cases}
+\gamma(-k) & k<0  \\
+5 \sigma_Z^2 & k=0  \\
+2 \sigma_Z^2 & k=1  \\
+0 & k>1
+\end{cases}
+$$
+
+$$
+\rho(k)=\frac{\gamma(k)}{\gamma(0)} = \begin{cases}
+\rho(-k) & k<0  \\
+1 & k=0  \\
+\frac{2}{5} & k=1  \\
+0 & k>1
+\end{cases} 
+$$
+
+Divergent
+
+$$
+\sum_{k=0}^{\infty}|\pi_{k}| = \sum_{k=0}^{\infty} 2^{k}
+$$
+
+```{r}
+theta = c(1.0,2.0)
+par( mfrow=c(2,1) );
+plot( arima.sim(n=150, list(ma=theta)  ) , main="MA2");
+
+set.seed=1
+(acf(arima.sim(n=1000, model=list(ma=theta))))
 ```
+
+Model 2
+
+$$
+X_t = Z_t + \frac{1}{2} Z_{t-1} \\
+\gamma(k) = cov[X_{t+k}, X_t] 
+= cov[ Z_{t+k} + \frac{1}{2} Z_{t+k-1}, Z_t + \frac{1}{2} Z_{t-1}] \\
+\gamma(0) = cov[ Z_{t} + \frac{1}{2} Z_{t-1}, Z_t + \frac{1}{2} Z_{t-1}]
+ = cov[Z_{t}, Z_{t}]  + \frac{1}{2} cov[Z_{t-1}, Z_{t-1}] = \sigma_Z^2 + \left(\frac{1}{2}\right)^2\sigma_Z^2 = \sigma_Z^2\left(1+\frac{1}{4}\right) \\
+\gamma(1) = cov[ Z_{t+1} + \frac{1}{2} Z_{t}, Z_t + \frac{1}{2} Z_{t-1}]
+ = \frac{1}{2} cov[Z_{t}, Z_{t}] = \frac{1}{2}\sigma_Z^2 \\
+\rho(1) = \frac{\gamma(1)}{\gamma(0)} = \frac{\frac{1}{2}\sigma_Z^2}{\sigma_Z^2\left(1+\frac{1}{4}\right)} = \frac{1}{2}\frac{4}{5} = \frac{2}{5}
+$$
+
+Convergent
+
+$$
+\sum_{k=0}^{\infty}|\pi_{k}| = \sum_{k=0}^{\infty}\frac{1}{2^{k}}
+$$
+
+```{r}
+theta = c(1.0,0.5)
+par( mfrow=c(2,1) );
+plot( arima.sim(n=150, list(ma=theta)  ) , main="MA2");
+
+set.seed=1
+(acf(arima.sim(n=1000, model=list(ma=theta))))
+```
+
+MA(1) -\> AR($\infty$)
+
+$$
+X_t = Z_t + \beta Z_{t-1} \\
+Z_t = X_t - \beta Z_{t-1} = X_t - \beta (X_{t-1} - \beta Z_{t-2} ) = X_t -\beta X_{t-1} +\beta^2 Z_{t-2} \\
+Z_t = \sum_{k=0}^{\infty}(-\beta)^kX_{t-k} \\
+X_t = Z_t + \sum_{k=1}^{\infty}(-\beta)^{k+1}X_{t-k} \\
+$$
+
+Convergence: $|\beta|<1$
+
+$$
+X_t = Z_t + \beta Z_{t-1} = Z_t + \beta B Z_{t} = (1+\beta B)Z_{t} = \beta(B)Z_{t} \\
+Z_t = \beta(B)^{-1} X_t \\
+\beta(B)^{-1} = \frac{1}{(1+\beta B)} = 1 - \beta B + \beta^2 B^2 +\cdots  = \sum_{k=1}^{\infty}(-\beta B)^{k-1}  \\
+$$
+
+1\.
+
+$$
+-3+\frac{3}{2}-\frac{3}{4}+\cdots 
+= -3 \sum_{k=0}^{\infty}\left(-\frac{1}{2}\right)^{k}\\
+a \sum_{k=0}^{\infty} r^{k}
+= \frac{a}{1-r}, \text{ if } |r|<1, \text{ convergent} \\
+S = \frac{-3}{1-\left(-\frac{1}{2}\right)}
+= \frac{-3}{\frac{3}{2}}
+= -2
+$$
+
+2\.
+
+$$
+\frac{4}{1+x} 
+= \frac{4}{1-(-x)} 
+= 4 \sum_{k=0}^{\infty} (-x)^{k}
+= 4 - 4x + 4x^2 - \cdots   \\ 
+\frac{a}{1-r} = a \sum_{k=0}^{\infty} r^{k}
+$$
+
+3\.
+
+$$
+X_t = 0.5 X_{t-1} + Z_t + 0.7 Z_{t-1} \\
+(1-0.5B)X_t = (1 + 0.7B) Z_{t}
+$$
+
+4.  AR(2)
+
+$$
+X_t = X_{t-1} + 2 X_{t-2} + Z_t \\
+(1-B-2B^2)X_t = Z_{t}
+$$
+
+5\.
+
+$$
+X_{t}=Z_{t}+3Z_{t-1} = (1+3B)Z_{t} \\
+1+3B=0 \implies r=-\frac{1}{3} \\
+|r| = | -\frac{1}{3} | = \frac{1}{3} < 1 \implies \text{not invertible}
+$$
+
+6\.
+
+$$
+X_t = Z_t - \theta Z_{t-1} - 6 \theta^2 Z_{t-2} = (1-\theta B-6\theta^2B^2) Z_t \\
+1-\theta B-6\theta^2B^2 = 0 \\
+S = -\frac{b}{a} = -\frac{-\theta}{-6\theta^2} = -\frac{1}{6\theta} \\
+P = \frac{c}{a} = \frac{1}{-6\theta^2} = -\frac{1}{6\theta^2} \\
+r_1 = -\frac{1}{2\theta} = -(2\theta)^{-1},\quad r_2 = \frac{1}{3\theta} = (3\theta)^{-1} \\
+|r| > 1  \implies \text{invertible} \\
+|r_1| = |-(2\theta)^{-1}| = |2\theta|^{-1} > 1 \implies |\theta| < \frac{1}{2} \\
+|r_2| = |(3\theta)^{-1}| = |3\theta|^{-1}  > 1 \implies |\theta| < \frac{1}{3} \\
+\implies |\theta| < \frac{1}{3}
+$$
+
+7.AR(2)
+
+$$
+X_t = X_{t-1} + 2 X_{t-2} + Z_t \\
+(1-B-2B^2)X_t = Z_{t} \\
+1-B-2B^2 = 0 \\
+S = -\frac{b}{a} = -\frac{-1}{-2} = -\frac{1}{2} \\
+P = \frac{c}{a} = \frac{1}{-2} = -\frac{1}{2} \\
+r_1 = -1,\quad r_2 = \frac{1}{2} \\
+|r| > 1  \implies \text{invertible and stationary} \\
+|r_1| = |-1| = 1 \\
+|r_2| = |\frac{1}{2}| = \frac{1}{2} < 1
+$$
+
+8.AR(2)
+
+$$
+X_t = 2\beta X_{t-1} - \beta^2 X_{t-2} + Z_t \\
+( 1-2\beta B + \beta^2 B^2 ) X_t = Z_t \\
+( 1-2\beta B + \beta^2 B^2 ) = 0 \\
+S = -\frac{b}{a} = -\frac{-2\beta}{\beta^2} = \frac{2}{\beta} \\
+P = \frac{c}{a} = \frac{1}{\beta^2}  \\
+r_1 = \frac{1}{\beta} = \beta^{-1} = r_2\\
+|r| > 1  \implies \text{invertible and stationary} \\
+|r| = |\beta^{-1}| = |\beta|^{-1}  > 1 \implies |\beta| < 1
+$$
+
+9.  AR(1), MA(2)
+
+$$
+X_t = 0.5 X_{t-1} + Z_t + 4 Z_{t-1} \\
+(1-0.5B)X_t = (1 + 4B) Z_{t} \\
+(1 + 4B) = 0 \implies r_{MA} = - \frac{1}{4}  \\
+|r_{MA}| = | - \frac{1}{4} | = \frac{1}{4} < 1  \\
+(1-0.5B) = 0 \implies r_{AR} = 2  \\
+|r_{AR}| = | 2 | = 2 > 1 
+$$
+
+10. AR(1), MA(2)
+
+$$
+X_t = \beta^2 X_{t-1} + Z_t + 8\theta^3 Z_{t-1} \\
+(1-\beta^2 B)X_t = (1 + 8\theta^3 B) Z_{t} \\
+(1-\beta^2 B) = 0 \implies r_{MA} = \frac{1}{\beta^2}  \\
+|r_{MA}| = | (\beta^2)^{-1} | = | \beta | ^{-2} \implies | \beta | < 1  \\
+(1 + 8\theta^3 B) = 0 \implies r_{AR} = \frac{1}{-8\theta^3} = -(2\theta)^{-3} \\
+|r_{AR}| = | -(2\theta)^{-3} | = | 2\theta | ^{-3} \implies | 2 \theta | < 1  \implies \theta < \frac{1}{2}
+$$
+
+## Yule Walker
+
+TODO: check material from diff eq and Yule Walker
+
+$$
+a_n = \lambda^n
+$$
+
+$$
+a_n=4a_{n-1}-3a_{n-2} \\
+\lambda^2 - 4\lambda+3=0 \\
+S = -\frac{b}{a} = -\frac{-4}{1} = 4 \\
+P = \frac{c}{a} = \frac{3}{1} = 3 \\
+\lambda_1 = 3, \quad \lambda_2=1
+$$
+
+$$
+a_{n} = 4a_{n-1} - 3a_{n-2}  \\
+a_n = c_1 + c_2 3^n \\
+a_{2} = 4 a_1 - 3 a_0 = 4 (-2) - 3 (2) = -8 -6 = -14 \\
+a_n = 4 - 2 (3^n) \\
+a_0 = 4 - 2 (3^0) = 4 -2 = 2 \\
+a_1 = 4 - 2 (3^1) = 4 - 6 = -2 \\
+a_2 = 4 - 2 (3^2) = 4 - 18 = -14
+$$
+
+AR(1) starting at lag 1, even function
+
+$$
+X_t=0.4X_{t-1}+Z_t \\
+\rho(k)=0.4\rho(k-1), \quad k \geq 1 \\
+\rho(0) = 1 \\
+\rho(k) = 0.4^{k}, \quad k \geq 0 \\
+\rho(k) = \rho(-k) \quad\forall k \in \mathbb{Z}^{-}
+$$
+
+AR(3)
+
+$$
+X_t = \frac{1}{2} X_{t-1} + \frac{1}{9} X_{t-2} - \frac{1}{18} X_{t-3} + Z_{t} \\
+18\lambda^3-9 \lambda^2 - 2 \lambda + 1 = 0 \\
+(2\lambda-1)(3\lambda-1)(3\lambda+1)=0 \\
+\rho(k) = \frac{1}{2} \rho(k-1) + \frac{1}{9} \rho(k-2)  - \frac{1}{18} \rho(k-3) \\
+\rho(k) = c_1 \left( \frac{1}{2} \right)^k + c_2 \left( \frac{1}{3} \right)^k + c_3 \left( -\frac{1}{3} \right)^k
+$$
+
+# Week-3
+
+MA(q): ACF cuts off after q lags
+
+AR(p): PACF cuts off after p lags
+
+The excess correlation at 𝑙𝑎𝑔 = 𝑘 not accounted for by a (𝑘 - 1)𝑠𝑡 order
+model, is the\
+partial correlation at lag=k\
+
+## PACF
+
+```{r, fig.height=15, fig.width=15}
+#{r}
+#{r, fig.asp = .8}
+# {r, echo=TRUE, fig.height=15, fig.width=15, out.retina=1}
+phi = c(-.9, -.6)
+par(mfrow=c(3,1))
+data.ts = arima.sim(n = 500, list(ar = phi ))
+plot(data.ts, 
+main = 
+paste(c("Autoregressive Process with phi=(", phi , ")"), collapse=" ") )
+acf(data.ts)
+acf(data.ts, type="partial")
+```
+
+```{r, fig.height=15, fig.width=15}
+par(mfrow=c(3,1))
+phi = c(.9, -.6, .3)
+data.ts = arima.sim(n = 500, list(ar=phi) )
+plot(data.ts, main= paste(c("Autoregressive Process with phi=(", phi , ")"), collapse=" ") ) 
+acf(data.ts)
+acf(data.ts, type="partial")
+```
+
+```{r, fig.height=15, fig.width=15}
+phi = c(.6, -.6)
+par(mfrow=c(2,1))
+data.ts = arima.sim(n = 1000, list(ar = phi ))
+plot(data.ts, 
+main = 
+paste(c("Autoregressive Process with phi=(", phi , ")"), collapse=" ") )
+acf(data.ts, type="partial")
+```
+
+## Wheat price
+
+```{r}
+library(data.table) 
+# Get the data
+beveridge <- fread('https://people.sc.fsu.edu/~jburkardt/datasets/time_series/beveridge_wheat.txt') 
+
+beveridge.ts = ts(beveridge[,2], start=1500)
+
+# Check MA
+mean(beveridge$V2[1:31])
+mean(beveridge$V2[2:32])
+
+beveridge.MA = filter(beveridge.ts, rep(1/31, 31), sides = 2)
+data.frame(beveridge$V1, beveridge$V2, beveridge.MA)
+
+plot( beveridge.ts, ylab="price", main="Beveridge Wheat Price Data")
+lines(beveridge.MA, col="red")
+```
+
+```{r, fig.height=15, fig.width=15}
+par(mfrow=c(3,1))
+Y = beveridge.ts/beveridge.MA
+plot( Y, ylab="scaled price", main="Transformed Beveridge Wheat Price Data")
+acf(na.omit(Y),
+main="Autocorrelation Function of Transformed Beveridge Data")
+acf(na.omit(Y), type="partial",
+main="Partial Autocorrelation Function of Transformed Beveridge Data")
+```
+
+```{r}
+ar(na.omit(Y), order.max = 5)
+```
+
+## Body fat
+
+```{r}
+# install.packages("isdals")
+library(isdals)
+data(bodyfat)
+attach(bodyfat)
+cor( cbind(Fat, Triceps,Thigh,Midarm) )
+
+pairs( cbind( Fat, Triceps, Thigh, Midarm) )
+
+# Check most correlated variables
+# (Fat,Thigh); (Fat,Triceps); (Triceps,Thigh)
+Fat.hat = predict(lm(Fat~Thigh))
+Triceps.hat = predict( lm(Triceps~Thigh) )
+cor( (Fat- Fat.hat), (Triceps- Triceps.hat) ) #returns 0.1749822
+# install.packages("ppcor")
+library(ppcor)
+pcor( cbind( Fat, Triceps, Thigh) )
+
+
+Fat.hat = predict(lm(Fat~Thigh+Midarm))
+Triceps.hat = predict( lm(Triceps~Thigh+Midarm) )
+cor( (Fat- Fat.hat), (Triceps- Triceps.hat) ) #returns 0.33815
+
+pcor( cbind( Fat, Triceps, Thigh, Midarm) )
+
+
+```
+
+## Partial Correlation
+
+Remove Thigh and Midarm dependencies
+
+$$
+Triceps(\phi - \hat{\phi}(Thigh,Midarm)), \quad \phi = Fat \\
+Fat(\tau - \hat{\tau}(Thigh,Midarm)), \quad \tau = Triceps \\ \\
+Triceps \times Fat
+$$
+
+## Lake Huron
+
+```{r, fig.height=15, fig.width=15}
+par( mfrow=c(3,1) )
+plot(LakeHuron)
+acf(LakeHuron)
+acf(LakeHuron, type="partial")
+```
+
+```{r, fig.height=15, fig.width=15}
+
+# install.packages("pracma")
+require(pracma)  # detrend
+
+LakeHuron.diff = diff(LakeHuron)
+
+par( mfrow=c(3,1) )
+plot(LakeHuron.diff)
+acf(LakeHuron.diff)$acf[1:3]
+acf(LakeHuron.diff, type="partial")$acf
+```
+
+```{r}
+
+R=matrix(1,2,2) # matrix of dimension 2 by 2, with entries all 1's.
+r=NULL
+r[1:2]=acf(LakeHuron.diff, plot=F)$acf[2:3]
+R[1,2]=r[1] # only diagonal entries are edited
+R[2,1]=r[1] # only diagonal entries are edited
+R
+
+b=matrix(r,nrow=2,ncol=1)
+b
+
+# solve(R,b) solves Rx=b, and gives x=R^(-1)b vector
+phi.hat=NULL
+phi.hat=solve(R,b)[,1]
+phi.hat
+
+#variance estimation using Yule-Walker Estimator
+c0=acf(LakeHuron.diff, type='covariance', plot=F)$acf[1]
+c0
+
+var.hat=c0*(1-sum(phi.hat*r))
+var.hat
+
+# constant term in the model
+phi0.hat=mean(my.data)*(1-sum(phi.hat))
+phi0.hat
+
+cat("Constant:", phi0.hat," Coefficients:", phi.hat, " and Variance:", var.hat, '\n')
+
+sqrt(var.hat)
+
+1-phi.hat[1]
+phi.hat[1] - phi.hat[2]
+```
+
+## Attitude
+
+```{r}
+# package: datasets
+attach(attitude);
+rcl = cbind(rating, complaints, learning);
+cor(rcl)
+
+rating.hat = predict( lm( rating ~ learning) )
+complaints.hat = predict( lm( complaints~learning) )
+
+cor( (rating - rating.hat ), ( complaints - complaints.hat ) )
+
+pcor(rcl)
+```
+
+## Recruitment
+
+```{r}
+library(astsa)
+my.data=rec
+
+# Plot rec 
+plot(rec, main='Recruitment time series', col='blue', lwd=3)
+```
+
+```{r, fig.height=15, fig.width=15}
+# subtract mean to get a time series with mean zero
+ar.process=my.data-mean(my.data)
+
+# ACF and PACF of the process
+par(mfrow=c(2,1))
+acf(ar.process, main='Recruitment', col='red', lwd=3)
+pacf(ar.process, main='Recruitment', col='green', lwd=3)
+```
+
+```{r}
+# order
+p=2
+
+# sample autocorreleation function r
+r=NULL
+r[1:p]=acf(ar.process, plot=F)$acf[2:(p+1)]
+cat('r=',r,'\n')
+
+# matrix R
+R=matrix(1,p,p) # matrix of dimension 2 by 2, with entries all 1's.
+
+# define non-diagonal entires of R
+for(i in 1:p){
+	for(j in 1:p){
+		if(i!=j)
+			R[i,j]=r[abs(i-j)]
+		}
+	}
+R
+
+# b-column vector on the right
+b=NULL
+b=matrix(r,p,1)# b- column vector with no entries
+b
+
+# solve(R,b) solves Rx=b, and gives x=R^(-1)b vector
+phi.hat=NULL
+phi.hat=solve(R,b)[,1]
+phi.hat
+
+#variance estimation using Yule-Walker Estimator
+c0=acf(ar.process, type='covariance', plot=F)$acf[1]
+c0
+
+var.hat=c0*(1-sum(phi.hat*r))
+var.hat
+
+# constant term in the model
+phi0.hat=mean(my.data)*(1-sum(phi.hat))
+phi0.hat
+
+cat("Constant:", phi0.hat," Coefficients:", phi.hat, " and Variance:", var.hat, '\n')
+```
+
+## Johnson & Johnson
+
+```{r}
+library(astsa)
+# Time plot for Johnson&Johnson
+plot(JohnsonJohnson, main='Johnson&Johnosn earnings per share', col='blue', lwd=3)
+```
+
+```{r, fig.height=15, fig.width=15}
+# log-return of Johnson&Johnson
+jj.log.return=diff(log(JohnsonJohnson))
+jj.log.return.mean.zero=jj.log.return-mean(jj.log.return)
+
+# Plots for log-returns
+par(mfrow=c(3,1))
+plot(jj.log.return.mean.zero, main='Log-return (mean zero) of Johnson&Johnosn earnings per share')
+acf(jj.log.return.mean.zero, main='ACF')
+pacf(jj.log.return.mean.zero, main='PACF')
+```
+
+```{r}
+# Order
+p=4
+
+# sample autocorreleation function r
+r=NULL
+r[1:p]=acf(jj.log.return.mean.zero, plot=F)$acf[2:(p+1)]
+r
+
+# matrix R
+R=matrix(1,p,p) # matrix of dimension 4 by 4, with entries all 1's.
+# define non-diagonal entires of R
+for(i in 1:p){
+	for(j in 1:p){
+		if(i!=j)
+			R[i,j]=r[abs(i-j)]
+		}
+	}
+R
+
+# b-column vector on the right
+b=matrix(r,p,1)# b- column vector with no entries
+b
+
+phi.hat=solve(R,b)[,1]
+phi.hat
+
+# Variance estimation using Yule-Walker Estimator
+c0=acf(jj.log.return.mean.zero, type='covariance', plot=F)$acf[1]
+c0
+var.hat=c0*(1-sum(phi.hat*r))
+var.hat
+
+# Constant term in the model
+phi0.hat=mean(jj.log.return)*(1-sum(phi.hat))
+phi0.hat
+
+cat("Constant:", phi0.hat," Coefficients:", phi.hat, " and Variance:", var.hat, '\n')
+```
+
+## Yule-Walker matrix
+
+### AR(2)
+
+x*t=phi1\*x*(t-1)+phi2\*x\_(t-2)+z_t z_t\~ N(0, sigma\^2)
+
+```{r, fig.height=15, fig.width=15}
+set.seed(2017)
+sigma=4
+phi=c(1/3,1/2)
+n=10000
+
+# simulated ar process
+ar2.process=arima.sim(n, model=list(ar=phi), sd=sigma)
+ar2.process[1:5]
+
+par(mfrow=c(3,1))
+plot(ar2.process, main='Simulated AR(2)')
+acf(ar2.process, main='ACF')
+pacf(ar2.process, main='PACF')
+```
+
+```{r}
+
+# acf terms
+r=NULL
+r[1:2]=acf(ar2.process, plot=T)$acf[2:3]  # 1: gamma(0)=1
+r
+
+R=matrix(1,2,2) # matrix of dimension 2 by 2, with entries all 1's.
+R[1,2]=r[1] # only diagonal entries are edited
+R[2,1]=r[1] # only diagonal entries are edited
+R
+
+b=matrix(r,nrow=2,ncol=1)# b- column vector with no entries
+b
+# coefficients estimation
+phi.hat=solve(R,b)
+phi.hat
+# variance estimation
+c0=acf(ar2.process, type='covariance', plot=F)$acf[1]
+var.hat=c0*(1-sum(phi.hat*r))
+var.hat
+```
+
+### AR(3)
+
+x_t=phi1\*x\_(t-1)+phi2\* x\_(t-2)+\\phi_3\*x\_(t-3)+z_t
+
+z_t\~ N(0, sigma\^2)
+
+```{r, fig.height=15, fig.width=15}
+set.seed(2017)
+sigma=4
+phi=c(1/3,1/2,7/100)
+n=100000
+
+ar3.process=arima.sim(n, model=list(ar=phi), sd=sigma)
+
+par(mfrow=c(3,1))
+plot(ar3.process, main='Simulated AR(3)')
+acf(ar3.process, main='ACF')
+pacf(ar3.process, main='PACF')
+```
+
+```{r}
+
+r=NULL
+r[1:3]=acf(ar3.process, plot=T)$acf[2:4]
+r
+
+R=matrix(1,3,3) 
+R[1,2]=r[1] 
+R[1,3]=r[2]
+R[2,1]=r[1]
+R[2,3]=r[1]
+R[3,1]=r[2]
+R[3,2]=r[1]
+R
+
+# b-column vector on the right
+b=matrix(,3,1)# b- column vector with no entries
+b[1,1]=r[1]
+b[2,1]=r[2]
+b[3,1]=r[3]
+b
+
+# solve Rx=b and find phi's
+phi.hat=solve(R,b)
+phi.hat
+
+# sigma estimation
+c0=acf(ar3.process, type='covariance', plot=F)$acf[1]
+var.hat=c0*(1-sum(phi.hat*r))
+var.hat
+```
+
+\$\$
+
+X_t = \phi\_0 + \phi\*1 X*{t-1} +* \phi\*2 X{t-2} + \phi\*3 X\*{t-3} +
+Z_t \$\$
+
+### AR(p)
+
+$$
+X_t = \phi_0 + \phi_1 X_{t-1} + \phi_2 X_{t-2} + \cdots + \phi_p X_{t-p} + Z_t
+$$
+
+$$
+E[X_{t-k}] = \mu, \quad E[Z_t] = 0
+$$
+
+Expectation$$
+\mu = \phi_0 + \phi_1 \mu + \phi_2 \mu + \cdots + \phi_p \mu + 0
+$$
+
+$$
+X_t - \mu = \phi_1 (X_{t-1} - \mu) + \phi_2 (X_{t-2} - \mu) + \cdots + \phi_p (X_{t-p} - \mu) + Z_t
+$$
+
+$$
+\tilde{X}_{t-k} = X_{t-k} - \mu, \quad E[\tilde{X}_t] = E[X_t] - \mu = \mu - \mu = 0
+$$
+
+$$
+\tilde{X}_t = \phi_1 \tilde{X}_{t-1} + \phi_2 \tilde{X}_{t-2} + \cdots + \phi_p \tilde{X}_{t-p} + Z_t
+$$
+
+AR(p) with null mean
+
+$$
+\mu = 0
+$$
+
+$$
+X_t = \phi_1 X_{t-1} + \phi_2 X_{t-2} + \cdots + \phi_p X_{t-p} + Z_t
+$$
+
+$$
+\rho(k) = \begin{cases}
+\phi_1\rho(k-1)+\phi_2\rho(k-2)+\cdots+\phi_p\rho(k-p), & k\geq 1\\
+1 & k=0 \\
+\rho(-k) & k < 0
+\end{cases}
+$$
+
+$$
+\rho(1) = \phi_1\rho(0)+\phi_2\rho(-1)+\cdots+\phi_p\rho(1-p) \\
+\rho(2) = \phi_1\rho(1)+\phi_2\rho(0)+\cdots+\phi_p\rho(2-p) \\
+\vdots\\
+\rho(p-1) = \phi_1\rho(p-2)+\phi_2\rho(p-3)+\cdots+\phi_p\rho(1) \\
+\rho(p) = \phi_1\rho(p-1)+\phi_2\rho(p-2)+\cdots+\phi_p\rho(0)
+$$
+
+$$
+\rho(1) = \phi_1+\phi_2\rho(1)+\cdots+\phi_p\rho(p-1) \\
+\rho(2) = \phi_1\rho(1)+\phi_2+\cdots+\phi_p\rho(p-2) \\
+\vdots\\
+\rho(p-1) = \phi_1\rho(p-2)+\phi_2\rho(p-3)+\cdots+\phi_p\rho(1) \\
+\rho(p) = \phi_1\rho(p-1)+\phi_2\rho(p-2)+\cdots+\phi_p
+$$
+
+$$
+\begin{Bmatrix}
+\rho(1) \\
+\rho(2) \\
+\vdots \\
+\rho(p-1) \\
+\rho(p)
+\end{Bmatrix}
+= 
+\begin{bmatrix}
+1 & \rho(1) & \rho(2) & \cdots & \rho(p-1) \\
+\rho(1) & 1 & \rho(1) & \cdots & \rho(p-2) \\
+\vdots & \vdots & \vdots & \vdots & \vdots \\
+\rho(p-2) & \rho(p-3) & \rho(p-4) & \cdots & \rho(1) \\
+\rho(p-1) & \rho(p-2) & \rho(p-3) &  \cdots & 1 \\
+\end{bmatrix}
+\begin{Bmatrix}
+\phi(1) \\
+\phi(2) \\
+\vdots \\
+\phi(p-1) \\
+\phi(p)
+\end{Bmatrix}\\
+b = R \phi \quad \text{unique solution}\\
+R^{-1} b = \phi
+$$
+
+$R$: symmetric, positive semidefinite, non-negative eigenvalues,
+invertible
+
+Discrete:
+$r\approx\rho,\quad \hat{\phi} \approx \phi,\quad \hat{R} \approx R$
+
+AR(2), with ($\phi_0=0$)
+
+$$
+X_t = \phi_1 X_{t-1} + \phi_2 X_{t-2} + Z_t
+$$
+
+$$
+\begin{Bmatrix}
+r_1 \\
+r_2
+\end{Bmatrix}
+= 
+\begin{bmatrix}
+1 & r_1 \\
+r_1 & 1
+\end{bmatrix}
+\begin{Bmatrix}
+\hat{\phi}_1 \\
+\hat{\phi}_2 
+\end{Bmatrix}
+$$
+
+$$
+r_1 = \hat{\phi}_1 + r_1 \hat{\phi}_2 \\
+r_2 = r_1 \hat{\phi}_1 + \hat{\phi}_2
+$$
+
+$$
+Z\sim\mathcal{N}(E[Z_t]=0,V[Z_t]=\sigma_Z^2)
+$$
+
+$$
+E[X_t] = \mu
+$$
+
+$$
+E[X_t] = \phi_1 E[ X_{t-1} ] +  \phi_2 E[ X_{t-2} ] + E [Z_t] \\
+\mu = \phi_1 \mu +  \phi_2 \mu + 0 = \mu (\phi_1+\phi_2) \implies \mu=0
+$$
+
+$$
+E[X_{t-k}X_t] = \phi_1 E[ X_{t-k} X_{t-1} ] +  \phi_2 E[ X_{t-k} X_{t-2} ] + E [ X_{t-k} Z_t] \\
+$$
+
+$$
+\mathrm{COV}[X_t, X_{t+k}] = \mathrm{E}\left[ X_{t} \cdot X_{t+k} \right] - \mathrm{E}\left[ X_{t} \right] \mathrm{E}\left[  X_{t+k} \right]
+$$
+
+$$
+\gamma(s,t) = \mathrm{Cov}[X_s,X_t] = \mathrm{E}\left[ (X_s - \mu_s) (X_t - \mu_t) \right] 
+$$
+
+$$
+V[X_t] = \phi_1^2 V[ X_{t-1} ] +  \phi_2^2 V[ X_{t-2} ] 
++ 2 \phi_1 \phi_2 cov(X_{t-1}, X_{t-2}) + V[Z_t]
+$$
+
+TODO: VER ESSE PASSO (COMO SURGE GAMMA 0 e GAMMA 1)
+
+$$
+V[X_t] = V[X_{t-1}] = V[X_{t-2}] = \gamma(0) \\
+cov(X_{t-1}, X_{t-2}) = \frac{\gamma(1)}{\gamma(0)} = \rho_1
+$$
+
+$$
+\sigma_Z^2 = \gamma(0) \left[1-\phi_1^2 - \phi_2^2 -
+ 2 \phi_1 \phi_2 \rho_1 \right]
+$$
+
+$$
+1-\phi_1^2 - \phi_2^2 -  2 \phi_1 \phi_2 \rho_1 \\
+= 1-\phi_1^2 - \phi_1 \phi_2 \rho_1 - \phi_2^2 -  \phi_1 \phi_2 \rho_1 \\
+= 1-\phi_1(\phi_1 + \rho_1\phi_2)  - \phi_2(\phi_2 +  \phi_1 \rho_1 )
+$$
+
+From the matrix equation:
+
+$$
+\rho_1 = \phi_1 + \rho_1\phi_2, \quad \rho_2 = \phi_2 + \rho_1\phi_1
+$$
+
+Therefore the variance:
+
+$$
+\sigma_Z^2 = \gamma(0) \left[1-\phi_1\rho_1 - \phi_2\rho_2  \right] \\
+\hat{\sigma}_Z^2 = c_0 \left[1-\hat{\phi}_1 r_1 - \hat{\phi}_2 r_2  \right] = c_0 \left[1- \sum_{i=1}^{p} \hat{\phi}_i r_i  \right]
+$$
+
+AR(3), with ($\phi_0=0$)
+
+$$
+X_t = \phi_1 X_{t-1} + \phi_2 X_{t-2} + \phi_3 X_{t-3} + Z_t
+$$
+
+$$
+\begin{Bmatrix}
+r_1 \\
+r_2 \\
+r_3
+\end{Bmatrix}
+= 
+\begin{bmatrix}
+1 & r_1 & r_2 \\
+r_1 & 1 & r_1 \\
+r_2 & r_1 & 1
+\end{bmatrix}
+\begin{Bmatrix}
+\hat{\phi}_1 \\
+\hat{\phi}_2 \\
+\hat{\phi}_3
+\end{Bmatrix}
+$$
+
+```{r}
+r=c(0.8,0.6,0.2)
+
+R=matrix(1,3,3) 
+R[1,2]=r[1] 
+R[1,3]=r[2]
+R[2,1]=r[1]
+R[2,3]=r[1]
+R[3,1]=r[2]
+R[3,2]=r[1]
+R
+
+# b-column vector on the right
+b=matrix(,3,1)# b- column vector with no entries
+b[1,1]=r[1]
+b[2,1]=r[2]
+b[3,1]=r[3]
+b
+
+# solve Rx=b and find phi's
+phi.hat=solve(R,b)
+phi.hat
+
+# sigma estimation
+c0=5
+var.hat=c0*(1-sum(phi.hat*r))
+var.hat
+```
+
+# Week-4
+
+## AIC
+
+-   credit: reduce the error sum of squares
+
+-   penalty: add parameters
+
+$$
+𝐴𝐼𝐶 = -2 \log(MLE) + 2p 
+$$
+
+$$
+𝐴𝐼𝐶 = \log(\hat{\sigma}^2) + \frac{n + 2p}{n}, \quad \hat{\sigma}^2 = \frac{SSE}{n}
+$$
+
+-   $MLE$ : maximum likelihood
+
+-   $p$: number of parameters in the model
+
+-   $n$: number of samples
+
+-   $SSE$: error sum of squares
+
+AR(2)
+
+$$
+X_t = 0.7X_{t-1}-0.2X_{t-2}+Z_t
+$$
+
+```{r}
+#{r, fig.height=15, fig.width=15}
+rm(list=ls(all=TRUE))
+set.seed(43) #Roman conquest of Britain
+data = arima.sim( list(order = c(2,0,0), ar =c( 0.7, -.2)), n = 2000)
+
+par(mfrow=c(1,2))
+acf(data, main="ACF of AR Data of Second Order")
+acf(data, type="partial", main="PACF of Time Series")
+
+```
+
+```{r}
+arima(data, order=c(2,0,0), include.mean=FALSE )
+```
+
+```{r}
+SSE=NULL
+AIC=NULL
+for (p in 1:5) {
+m = arima(data, order=c(p,0,0), include.mean=FALSE )
+SSE[p] = sum(resid(m)^2)
+AIC[p] = m$aic
+print( m$coef )
+print( paste(m$aic, sum(resid(m)^2)) )
+}
+
+
+```
+
+```{r}
+par(mfrow=c(1,2))
+order=c(1,2,3,4,5)
+plot(SSE~order, main="SSE plotted on Order of AR(p) Model", ylim=c(1800, 2100))
+plot(AIC~order, main="AIC plotted on Order of AR(p) Model", ylim=c(5500, 5800))
+```
+
+```{r}
+rm(list=ls(all=TRUE))
+set.seed(500) #500	Seven kingdoms Kent, Essex, Sussex, Wessex, East Anglia, Mercia, and Northumbria.)
+data = arima.sim( list(order = c(3,0,0), ar =c( 0.6, -0.1, .4)), n = 5000)
+
+arima(data, order=c(2,0,0), include.mean=FALSE )
+arima(data, order=c(3,0,0), include.mean=FALSE )
+arima(data, order=c(4,0,0), include.mean=FALSE )
+```
+
+```{r}
+rm(list=ls(all=TRUE))
+set.seed(597) # Saint Augustine arrives in England
+data = arima.sim( list(order = c(1,0,0), ar = .3), n = 5000)
+
+par(mfrow=c(1,2))
+acf(data, main="ACF of Time Series Data")
+acf(data, type="partial", main="PACF of Time Series Data")
+```
+
+```{r}
+arima(data, order=c(1,0,0) );
+arima(data, order=c(2,0,0) );
+arima(data, order=c(3,0,0) );
+```
+
+```{r}
+library(forecast)
+data = arima.sim( n=1E4, list(ar=.5, ma=.2) )
+auto.arima(data)
+```
+
+
+## ARMA
+
+ARMA(p,q)
+$$
+X_t = \phi_1 X_{t-1} + \cdots + \phi_p X_{t-p} + \beta_0 Z_t + \beta_1 Z_{t-1} + \cdots + \beta_q Z_{t-q} \\
+\phi(B)X_t = \beta(B)Z_t \\
+\phi(B) = 1 - \phi_1 B - \cdots - \phi_p B^{p} \\
+\beta(B) = \beta_0 + \beta_1 B - \cdots - \beta_q B^{q}
+$$
+$$
+X_t = \sum_{i=1}^{n=p} \phi_i X_{t-i} + \sum_{i=0}^{n=q} \theta_i Z_{t-i}
+$$
+
+Terms
+* Noise: $Z_t$
+* AR: $\sum_{i=1}^{n=p} \phi_i X_{t-i}$
+* MA: $\sum_{i=1}^{n=q} \theta_i Z_{t-i}$
+
+Operators
+$$
+\Theta(B)Z_t = \Phi(B) X_t \\
+\Psi(B) = \frac{\Theta(B)}{\Phi(B)}
+$$
+
+$$
+X_t  = \frac{\Theta(B)}{\Phi(B)}Z_t = \Psi(B) Z_t
+$$
+
+
+MA mixed
+$$
+X_t = 0.5X_{t-1} + Z_t + 0.2 Z_{t-1} \\
+(1-0.5B)X_t = (1+0.2B) Z_t \\
+X_t = \frac{(1+0.2B)}{(1-0.5B)}Z_t \\
+X_t = (1+0.2B)(1+0.5B+0.25B^2+0.125B^3 + \cdots)Z_t \\
+X_t = (1+0.5B+0.25B^2+0.125B^3 + 0.2B + 0.1B^2+0.05B^3+0.025B^4 + \cdots)Z_t \\
+X_t = (1+0.7B+0.35B^2+0.175B^3 + \cdots)Z_t \\
+$$
+
+The coefficients on the polynomial should decay rather quickly.
+
+```{r}
+phi=.5
+beta=0.2
+sigma=3
+m=10000
+
+set.seed(5)
+Simulated.Arima = 
+    arima.sim(
+      n=m,
+      list(order = c(1,0,1), 
+           ar = phi, 
+           ma=beta)
+      )
+acf(Simulated.Arima)
+```
+
+
+
+## ARIMA
+
+```{r}
+# parameters
+phi=c(.7, .2)
+beta=0.5
+sigma=3
+m=10000
+
+set.seed(5)
+(Simulated.Arima = 
+    arima.sim(
+      n=m,
+      list(order = c(2,1,1), 
+           ar = phi, 
+           ma=beta)
+      )
+  )
+```
+
+```{r}
+plot(Simulated.Arima, ylab=' ',main='Simulated time series from ARIMA(2,1,1) process', col='blue', lwd=2)
+```
+
+```{r}
+acf(Simulated.Arima)
+```
+
+```{r}
+Diff.Simulated.Arima=diff(Simulated.Arima)
+plot(Diff.Simulated.Arima)
+```
+
+```{r}
+acf(Diff.Simulated.Arima)
+```
+
+```{r}
+pacf(Diff.Simulated.Arima)
+```
+
+```{r}
+library(astsa)
+sarima(Simulated.Arima,2,1,1,0,0,0) # astsa not installed
+```
+
+```{r}
+library(forecast)
+auto.arima(Simulated.Arima) # forecast not installed
+```
+
+```{r}
+(fit1<-arima(Diff.Simulated.Arima, order=c(4,0,0)))
+```
+
+```{r}
+(fit2<-arima(Diff.Simulated.Arima, order=c(2,0,1)))
+```
+
+```{r}
+(fit3<-arima(Simulated.Arima, order=c(2,1,1)))
+```
+
+
+## Daily female births in California, 1959
+
+The following time series is taken from Time Series Data Library (TSDL)
+TSDL was created by Rob Hyndman
+Professor of Statistics at Monash University, Australia.
+====== Daily total female birth in California, 1959 =======
+Data is exported as csv file to the working directory
+Link: https://datamarket.com/data/list/?q=cat:fwy%20provider:tsdl
+
+
+
+```{r}
+library(astsa)
+
+# read data to R variable
+birth.data<-read.csv("./data/daily-total-female-births-in-cal.csv")
+
+# pull out number of births column
+number_of_births<-birth.data$Daily.total.female.births.in.California..1959
+
+# use date format for dates
+birth.data$Date <- as.Date(birth.data$Date, "%m/%d/%Y")
+
+plot.ts(number_of_births,main='Daily total female births in california, 1959', ylab = 'Number of births')
+```
+
+```{r}
+# Test for correlation
+Box.test(number_of_births, lag = log(length(number_of_births)))
+```
+
+```{r}
+# Plot the differenced data
+plot.ts(diff(number_of_births), main='Differenced series', ylab = '')
+```
+
+
+```{r}
+# Test for correlation in the differenced data
+Box.test(diff(number_of_births), lag = log(length(diff(number_of_births))))
+```
+
+```{r}
+# acf of the differenced data
+acf(diff(number_of_births), main='ACF of differenced data', 50)
+
+```
+```{r}
+# pacf of the differenced data
+pacf(diff(number_of_births), main='PACF of differenced data', 50)
+```
+
+```{r}
+# Fit various ARIMA models
+
+
+model1<-arima(number_of_births, order=c(0,1,1))
+SSE1<-sum(model1$residuals^2)
+model1.test<-Box.test(model1$residuals, lag = log(length(model1$residuals)))
+
+model2<-arima(number_of_births, order=c(0,1,2))
+SSE2<-sum(model2$residuals^2)
+model2.test<-Box.test(model2$residuals, lag = log(length(model2$residuals)))
+
+model3<-arima(number_of_births, order=c(7,1,1))
+SSE3<-sum(model3$residuals^2)
+model3.test<-Box.test(model3$residuals, lag = log(length(model3$residuals)))
+
+model4<-arima(number_of_births, order=c(7,1,2))
+SSE4<-sum(model4$residuals^2)
+model4.test<-Box.test(model4$residuals, lag = log(length(model4$residuals)))
+
+df<-data.frame(row.names=c('AIC', 'SSE', 'p-value'), c(model1$aic, SSE1, model1.test$p.value), 
+               c(model2$aic, SSE2, model2.test$p.value), c(model3$aic, SSE3, model3.test$p.value),
+               c(model4$aic, SSE4, model4.test$p.value))
+colnames(df)<-c('Arima(0,1,1)','Arima(0,1,2)', 'Arima(7,1,1)', 'Arima(7,1,2)')
+
+
+
+format(df, scientific=FALSE)
+```
+
+```{r}
+# Fit a SARIMA model
+
+sarima(number_of_births, 0,1,2,0,0,0)
+
+```
+
+
+
+## Ljung-Box Q Statistic
+
+
+ARMA(p,q)
+$$
+X_t = \phi_1 X_{t-1} + \cdots + \phi_p X_{t-p} + \beta_0 Z_t + \beta_1 Z_{t-1} + \cdots + \beta_q Z_{t-q} \\
+\phi(B)X_t = \beta(B)Z_t \\
+\phi(B) = 1 - \phi_1 B - \cdots - \phi_p B^{p} \\
+\beta(B) = \beta_0 + \beta_1 B - \cdots - \beta_q B^{q}
+$$
+
+Difference operator
+* remove trend from non-stationary processes
+
+$$
+\nabla = 1 -B
+$$
+
+
+$$
+\nabla X_t = X_t - X_{t-1} = (1-B)X_t
+$$
+
+
+Random walk
+$$
+X_t = X_{t-1} + Z_t \\
+\nabla X_t = Z_t
+$$
+
+ARIMA(p,d,q)
+Autorregressive Integrated Moving Average of order (p,d,q)
+$$
+Y_t := \nabla^d X_t = (1-B)^d X_t \\
+Y_t \sim \text{ARMA}(p,q)
+\implies
+X_t \sim \text{ARIMA}(p,d,q)
+$$
+
+
+$$
+\phi(B)\nabla^d X_t = \beta(B) Z_t \\
+\phi(B) ( 1-B) ^d X_t = \beta(B) Z_t
+$$
+
+
+Order of differencing $d$
+* $d=1$ or $d=2$
+* over differencing may introduce dependence
+* ACF might also suggest differencing is needed
+* $\phi(z)(1-z)^d$ has unit root with multiplicity $d$
+* ACF will decay very slowly
+
+
+ARIMA(3,0,2)
+$$
+X_t = \phi_1 X_{t-1} + \phi_2 X_{t-2} + \phi_3 X_{t-3} + Z_t + \beta_1 Z_{t-1} +  \beta_2 Z_{t-2} \\
+(1-\phi_1 B - \phi_2 B^2 - \phi_3 B^3 )X_t = (1-\beta_1 B - \beta_2 B^2)  Z_t
+$$
+
+$$
+(1+0.2B)\nabla X_t = (1-0.3B)Z_t \\
+(1+0.2B)(1-B) X_t = (1-0.3B)Z_t \\
+(1+0.2B-B-0.2B^2) X_t = (1-0.3B)Z_t \\
+(1-0.8B-0.2B^2) X_t = (1-0.3B)Z_t \\
+X_t = 0.8X_{t-1} + 0.2 X_{t-2} + Z_t - 0.3Z_{t-1}
+$$
+
+
+
+
+$$
+X_t = 3 X_{t-2} - 2 X_{t-3} + Z_{t} + 5 Z_{t-1}  \\
+( 1 - 3 B^2 + 2 B^3 )X_t =  (1-5B) Z_{t}  \\
+$$
+
+ARIMA(2,1,1)
+* Since $1-3 \cdot 1^2+2 \cdot 1^3=0$, we obtain that $1-B$ divides $1-3B^2+2B^3$.
+* Long division would give us $1-3B^2+2B^3=(1+B-2B^2)(1-B)$.
+* Here $(1+B-2B^2)(1+B−2B^2)$ could be taken as AR polynomial.
+* Note that the factor $(1-B)$ would make the process nonstationary. 
+
+ARIMA(3,0,1)
+* Even though there are 2 AR terms, the order is 3 since we have $-2X_{t-3}$
+* And there is 1 MA term.
+* Note that the process is not invertible since the root of the polynomial $1+5B$ lies inside the unit circle. How about stationarity?
+
+ARIMA(1,2,1)
+* $1 −3B^2 +2B^3$ can be factorized as $(1+2B)(1-B)^2$,
+where we have 1 AR terms (degree of the AR polynomial $1+2B$), and two differencing $(1-B)^2$. Note that process is nonstationary. Why is that? 
+
+
+We have some time series whose Q-statistic at lag=4 is calculated, and corresponding p-value is found: p-value=0.340.34. What does it mean
+
+* We do not have enough evidence to reject the null hypothesis that there is no autocorrelation UNTIL lag 4.
+* The null hypothesis is $H_0: \rho_1=\rho_2=\rho_3=\rho_4=0$
+* Since 0.34 is not smaller than any reasonable significance level, we cannot reject the null hypothesis.
+
+
+We have some time series whose Q-statistic at lag=10 is calculated, and corresponding p-value is found: p-value=0.00034. What does it mean?
+
+* There is a significant autocorrelation at at least one lag until lag 10.
+* A low p-value is an evidence against the null hypothesis.
+* We do have sufficient evidence to reject that all autocorrelation coefficients until lag 10 is zero. 
+* p-value if the probability of obtained data given that the null hypothesis is correct. A low p-value is an evidence against the null hypothesis.
+
+## BJsales
+
+```{r}
+BJsales
+plot(BJsales)
+```
+
+* There are ups and downs with a general upward trend.  
+* Time series is not stationary.
+  * There is a trend which means mean is changing. 
+
+```{r}
+plot(diff(BJsales))
+```
+* It does not seem to be stationary since there are still upward or downward trends in different parts of the time plot.
+ * There is, for example, an upward trend between (50,100) but a downward trend between (100,150). That means the mean is changing.  
+
+```{r}
+plot(diff(diff(BJsales)))
+```
+
+* There is no systematic change in mean. 
+ * Mean level seems to be constant, around 0.
+* Variance towards the end of the series seems to be different from the variance in the other parts of the plot. 
+ * It seems that variance is smaller towards the end of the plot. One may say that difference in the change of the variance is not high, and thus can be ignored. 
+
+```{r}
+(pacf(diff(diff(BJsales))))
+```
+
+* Lags: 1, 2, 3, 10, 19
+* Keeping parsimony principle in mind, the order of AR terms can be 0,1,2 or 3.
+* One might say that Lag 19 is barely significant.
+* AR(p): PACF cuts off after p lags
+
+
+
+
+
+
+
+```{r}
+(acf(diff(diff(BJsales))))
+```
+* Lags: 1, 8, 11
+* If we ignore barely significant lags, the order of MA term can be 0 or 1.
+* Lag  8 and Lag 11 are barely significant.
+* MA(q): ACF cuts off after q lags
+* Keeping parsimony principle in mind, the order of MA term can be 0 or 1.
+
+
+
+```{r}
+d=2
+for(p in 1:4){
+  for(q in 1:2){
+        if(p+d+q<=8){
+          model<-arima(x=BJsales, order = c((p-1),d,(q-1)))
+          pval<-Box.test(model$residuals, lag=log(length(model$residuals)))
+          sse<-sum(model$residuals^2)
+          cat(p-1,d,q-1, 'AIC=', model$aic, ' SSE=',sse,' p-VALUE=', pval$p.value,'\n')
+        }
+      }
+}
+```
+
+
+* AIC: ARIMA(0,2,1), Smallest AIC=517.1371
+* SSE: ARIMA(3,2,1), Smallest SSE value is 264.0684.
+
+```{r, fig.height=12, fig.width=16}
+model<-arima(BJsales, order=c(0,2,1))
+
+par(mfrow=c(2,2))
+
+plot(model$residuals)
+acf(model$residuals)
+pacf(model$residuals)
+qqnorm(model$residuals)
+```
+
+Is there compelling evidence against the whiteness of the residuals?
+* No, since QQ-plot seems linear.
+* No, since ACF and PACF has no significant lags. 
+
+```{r}
+summary(model)
+```
+
+$$
+Y_t = \nabla^2 X_t = (1+\beta_1 B)Z_t = Z_t +\beta_1 Z_{t-1} \\
+(1-B)^2 X_t = (1-2B+B^2) X_t = (1+\beta_1 B)Z_t \\
+X_t = 2X_{t-1} - X_{t-2} +  Z_t +\beta_1 Z_{t-1} \\
+X_t -2X_{t-1} + X_{t-2} = Z_t +\beta_1 Z_{t-1}
+$$
+
+
+# Week-5
+
+
+## SARIMA(p,d,q,P,D,Q)S
+* p: $X_t$
+* d
+* q: $Z_t$
+* P: $X_t$
+* D
+* Q: $Z_t$
+* S: 12
+
+
+
+S=12
+$$
+(1+0.1B-0.2B^2)(1+0.25B^{12})X_t
+= (1-0.3B)(1+0.5B^{12})Z_t\\
+(1+0.1B-0.2B^2) \implies p=2 \\
+(1+0.25B^{12}) \implies P=1 \\
+(1-0.3B) \implies q=1 \\
+(1+0.5B^{12}) \implies Q=1 \\
+SARIMA(2,0,1,1,0,1)_{12} \\
+(1+0.1B-0.2B^2+0.25B^{12}+0.025B^{13}-0.05B^{14})X_t
+= (1+0.5B^{12}-0.3B-0.15B^{13})Z_t\\
+\implies SARIMA(14,0,13,0,0,0)_1
+$$
+
+There is no differencing in the process, 
+thus $d=0$ and $D=0$. 
+AR polynomial gives $p=2$, 
+and seasonal AR polynomial with degree $12*1$ gives $P=1$.
+
+The total number of parameters in this model is 27+1=28. 
+In modeling, we prefer the simplest possible model to avoid overfitting. 
+Including the span of the seasonality of 12 would give us a simpler model.
+
+
+
+S=24
+$$
+(1+0.1B)(1+0.25B^{12}-0.7B^{24})(1-B)(1-B^{12})X_t
+= Z_t\\
+(1+0.1B) \implies p=1 \\
+(1+0.25B^{12}-0.7B^{24}) \implies P=2 \\
+(1-B) \implies d=1 \\
+(1-B^{12}) \implies D=1 \\
+SARIMA(1,1,0,2,1,0)_{12} \\
+Z_t = (1+0.25B^{12}-0.7B^{24}+0.1B+0.025B^{13}-0.07B^{25})(1-B-B^{12}+B^{13})X_t 
+\\
+Z_t = (1+0.25B^{12}-0.7B^{24}+0.1B+0.025B^{13}-0.07B^{25} \\
+-B-0.25B^{13}+0.7B^{25}-0.1B^{2}-0.025B^{14}+0.07B^{26} \\
+-B^{11}-0.25B^{24}+0.7B^{36}-0.1B^{13}-0.025B^{25}+0.07B^{37} \\
+B^{12}+0.25B^{25}-0.7B^{37}+0.1B^{14}+0.025B^{26}-0.07B^{38})X_t \\
+Z_t = (1-0.9B-0.1B^{2} \\
+-B^{11}+1.25B^{12}-0.325B^{13}+0.0975B^{14} \\
+-0.95B^{24}+0.855B^{25}+0.095B^{26} \\
++0.7B^{36}-0.63B^{37}-0.07B^{38})X_t \\
+\implies SARIMA(38,0,0,0,0,0)_{1}
+$$
+
+Seasonal AR polynomial has a degree of $24=2*12$ which gives us $P=2$.
+
+Probably useless, but correct. 
+If we expand the polynomial $(1+0.1 B)(1+0.25 B^{12}-0.7 B^{48})(1-B)(1-B^{12})$,
+we obtain an AR polynomial with a degree of $38$.
+
+
+$SARIMA(0,0,2,0,0,1)_{12}$
+
+MA: 0.2, 0.3
+SMA: 0.5
+$\sigma^2_Z=1$
+
+
+$$
+X_t = (1+0.2B+0.3B^2)(1+0.5B^{12})Z_t \\
+X_t = (1+0.2B+0.3B^2+0.5B^{12}+0.1B^{13}+0.15B^{14})Z_t \\
+X_t = Z_t+0.2Z_{t-1}+0.3Z_{t-2}+0.5Z_{t-12}+0.1Z_{t-13}+0.15Z_{t-14}
+$$
+
+
+TODO: check why
+$$
+\rho(3)=0
+$$
+
+
+Check the name of lambda
+$$
+X_{t-10} = Z_{t-10}+0.2Z_{t-11}+0.3Z_{t-12}+0.5Z_{t-22}+0.1Z_{t-23}+0.15Z_{t-24} \\
+Z_{t-12} \implies Cov(X_t,X_{t-10}) = 0.3\cdot 0.5 = 0.15 \implies \lambda(10) = 0.15
+$$
+$Z_{t−12}$ is common term with coefficient 0.3 and 0.5 for both equations 
+of $X_t$ and $X_{t-10}$.
+
+
+
+## Fit SARIMA Process
+
+1. Time plot
+2. Transformation (stationary)
+3. Differencing (seasonal or non-seasonal)
+4. ACF: Closers spikes: MA order
+5. ACF: spikes around seasonal lags: SMA order
+6. PACF: Closers spikes: AR order
+7. PACF: spikes around seasonal lags: SAR order
+8. Fit few different models
+9. Compare AIC, SSE, choose model with minimum AIC
+10. Parsimony principle (order sum <= 6)
+11. Time plot, ACF, PACF of residuals
+12. Ljung-Box test for residuals
+
+## Examples
+```{r}
+x=NULL
+z=NULL
+n=10000
+
+z=rnorm(n)
+
+# TODO: CHECK WHY THIS
+x[1:13]=1
+
+for(i in 14:n){
+  x[i]<-z[i]+0.7*z[i-1]+0.6*z[i-12]+0.42*z[i-13]
+}
+
+plot.ts(x[12:120], main='The first 10 months of simulation SARIMA(0,0,1,0,0,1)_12', ylab='') 
+
+
+```
+
+```{r}
+acf(x, main='SARIMA(0,0,1,0,0,1)_12 Simulation')
+```
+
+
+
+
+## Johnson e Johnson
+
+
+```{r}
+library(astsa)
+
+d=1
+DD=1
+
+per=4
+
+for(p in 1:2){
+  for(q in 1:2){
+    for(i in 1:2){
+      for(j in 1:2){
+        if(p+d+q+i+DD+j<=10){
+          model<-arima(x=log(jj), order = c((p-1),d,(q-1)), seasonal = list(order=c((i-1),DD,(j-1)), period=per))
+          pval<-Box.test(model$residuals, lag=log(length(model$residuals)))
+          sse<-sum(model$residuals^2)
+          cat(p-1,d,q-1,i-1,DD,j-1,per, 'AIC=', model$aic, ' SSE=',sse,' p-VALUE=', pval$p.value,'\n')
+        }
+      }
+    }
+  }
+}
+```
+
+
+```{r}
+sarima(log(jj), 0,1,1,1,1,0,4)
+```
+
+## Milk production
+
+The time series is downloaded from TSDL.
+
+```{r}
+milk<-read.csv('./data/monthly-milk-production-pounds-p.csv')
+Milk<-milk$Pounds
+plot(Milk)
+```
+
+```{r}
+par(mar=c(3,3,3,1))
+acf2(Milk)
+```
+
+
+```{r}
+plot(diff(Milk))
+plot(diff(diff(Milk)))
+diff2 = diff(diff(Milk),12)
+plot(diff2)
+```
+
+```{r}
+par(mar=c(3,3,3,1))
+acf(diff2, lag.max=50, main='ACF')
+par(mar=c(3,3,3,1))
+pacf(diff2, lag.max=50, main='PACF')
+```
+
+diff2: make the process stationary
+ACF:  q=0; Q=0,1,2,3 (seasonal at 12, 24, 36)
+PACF: p=0; P=0,1,2
+
+
+
+```{r}
+library(astsa)
+library(forecast)
+
+d=NULL
+DD=NULL
+d=1
+DD=1
+
+per=12
+for(p in 1:1){
+  for(q in 1:1){
+    for(i in 1:3){
+      for(j in 1:4){
+        if(p+d+q+i+DD+j<=10){
+          model<-arima(x=Milk, order = c((p-1),d,(q-1)), seasonal = list(order=c((i-1),DD,(j-1)), period=per))
+          pval<-Box.test(model$residuals, lag=log(length(model$residuals)))
+          sse<-sum(model$residuals^2)
+          cat(p-1,d,q-1,i-1,DD,j-1,per, 'AIC=', model$aic, ' SSE=',sse,' p-VALUE=', pval$p.value,'\n')
+        }
+      }
+    }
+  }
+}
+```
+
+```{r}
+library(astsa)
+sarima(Milk, 0,1,0,0,1,1,12)
+```
+
+
+$$
+(1-B)(1-B^{12})X_t = (1+\Theta B^{12})Z_t \\
+X_t = X_{t-1} + X_{t-12} - X_{t-13} + Z_t + \Theta Z_{t-12} \\
+\hat{\Theta} = - 0.675, \quad |_t \sim \mathcal{N} (\mu=0, \sigma^2=34.47)
+$$
+
+
+```{r}
+model<- arima(x=Milk, order = c(0,1,0), seasonal = list(order=c(0,1,1), period=12))
+summary(model)
+```
+```{r}
+forecast(model)
+```
+
+```{r}
+plot(forecast(model))
+```
+
+## Sales at a souvenir shop
+
+The time series is downloaded from TSDL.
+https://datamarket.com/data/set/22mh/monthly-sales-for-a-souvenir-shop-on-the-wharf-at-a-beach-resort-town-in-queensland-australia-jan-1987-dec-1993#!ds=22mh&display=line
+
+
+```{r, fig.width=12, fig.height=8}
+SUV<-read.csv('./data/monthly-sales-for-a-souvenir-sho.csv')
+suv<-ts(SUV$Sales)
+
+library(astsa)
+library(forecast)
+
+
+
+par(mfrow=c(2,2))
+
+plot(suv, main='Monthly sales for a souvenir shop', ylab='', col='blue', lwd=3)
+plot(log(suv), main='Log-transform of sales', ylab='', col='red', lwd=3)
+plot(diff(log(suv)), main='Differenced Log-transform of sales', ylab='', col='brown', lwd=3)
+plot(diff(diff(log(suv)),12), main='Log-transform without trend and seasonality', ylab='', col='green', lwd=3)
+```
+
+Assume that seasonal diff is stationary. Actually there is a variance variation.
+
+
+```{r}
+par(mar=c(3,3,3,2))
+acf2(suv)
+```
+
+
+
+```{r}
+data<-diff(diff((log(suv)),12))
+par(mar=c(3,3,3,2))
+acf2(data, 50)
+```
+
+ACF: q=0,1; Q=0,1,2,3
+PACF: p=0,1; P=0,1
+
+
+```{r}
+d=1
+DD=1
+per=12
+for(p in 1:2){
+  for(q in 1:2){
+    for(i in 1:2){
+      for(j in 1:4){
+        if(p+d+q+i+DD+j<=10){
+          model<-arima(x=log(suv), order = c((p-1),d,(q-1)), seasonal = list(order=c((i-1),DD,(j-1)), period=per))
+          pval<-Box.test(model$residuals, lag=log(length(model$residuals)))
+          sse<-sum(model$residuals^2)
+          cat(p-1,d,q-1,i-1,DD,j-1,per, 'AIC=', model$aic, ' SSE=',sse,' p-VALUE=', pval$p.value,'\n')
+        }
+      }
+    }
+  }
+}
+```
+
+
+```{r}
+model<- arima(x=log(suv), order = c(1,1,0), seasonal = list(order=c(0,1,1), period=12))
+summary(model)
+```
+
+
+$$
+Y_t = \log(X_t) \\
+(1-\phi B)(1-B)(1-B^{12})Y_t = (1+\Theta B^{12})Z_t \\
+Y_t = (1+\phi) Y_{t-1} - phi Y_{t-2} - (1+\phi) Y_{t-13} + \phi Y_{t-14} + Z_t + \Theta Z_{t-12} \\
+\hat{\phi} = - 0.5017, \quad  \hat{\Theta} = - 0.5107, \quad |_t \sim \mathcal{N} (\mu=0, \sigma^2=0.03111)
+$$
+
+
+```{r}
+sarima(log(suv),1,1,0,0,1,1,12)
+```
+
+Residuals analysis
+standardized residual looks white
+no autocorrelation
+qqplot: linear, systematic departure at tails
+p-values no significance correlation in the residuals
+
+
+
+```{r}
+forecast(model)
+```
+
+```{r}
+plot(forecast(model))
+```
+
+```{r}
+a<-sarima.for(log(suv),12,1,1,0,0,1,1,12)
+
+plot.ts(c(suv,exp(a$pred)), main='Monthly sales + Forecast', ylab='', col='blue', lwd=3)
+```
+
+
+```{r}
+sarima(log(suv),0,1,3,0,1,1,12)
+```
+
+
+
+## USAccDeaths
+
+
+1. Time plot
+2. Transformation (stationary)
+3. Differencing (seasonal or non-seasonal)
+
+
+```{r, fig.width=12, fig.height=8}
+
+data = USAccDeaths
+
+library(astsa)
+library(forecast)
+
+par(mfrow=c(2,2))
+
+plot(data, main='', ylab='', col='blue', lwd=3)
+plot(log(data), main='Log-transform', ylab='', col='red', lwd=3)
+plot(diff(log(data)), main='Differenced Log-transform', ylab='', col='brown', lwd=3)
+plot(diff(diff(log(data)),12), main='Log-transform without trend and seasonality', ylab='', col='green', lwd=3)
+```
+
+```{r}
+help(USAacDeaths)
+```
+
+It is a monthly time series with a span of seasonality 12. 
+help(USAacDeaths) routine gives more information about the series including being monthly time series.
+
+Time series is not stationary since there is a seasonal trend????
+There is definitely a seasonal trend which repeats itself every 12 data points. This time series is a monthly time series. 
+
+
+We first get rid of the seasonal trend by differencing the values at the same month of each year. Plot the seasonally differenced time series in the code block below. 
+There is a clear upward trend. 
+Clear upward trend violates stationarity.
+
+4. ACF: Closers spikes: MA order
+5. ACF: spikes around seasonal lags: SMA order
+6. PACF: Closers spikes: AR order
+7. PACF: spikes around seasonal lags: SAR order
+
+```{r}
+#acf2(diff(data))
+#acf2(diff(log(data)))
+acf2(diff(diff(log(data)),12),max.lag=30)
+```
+
+
+
+We de-trend the seasonally differenced time series by taking non-seasonal differencing, diff()
+
+The significant partial autocorrelation coefficient at lag 12 suggests the order of seasonal AR term, $P\leq 1$.
+
+Significant adjacent lags in PACF suggest the order of AR terms, $p\leq 2$. 
+
+Significant adjacent lags in ACF suggest the order of MA terms, $q\leq 1$.
+
+The significant autocorrelation coefficient at lag 12 suggests the order of seasonal MA term, $Q\leq 1$.
+
+
+8. Fit few different models
+9. Compare AIC, SSE, choose model with minimum AIC
+10. Parsimony principle (order sum <= 6)
+
+```{r}
+d=1
+DD=1
+per=12
+for(p in 1:2){
+  for(q in 1:2){
+    for(i in 1:2){
+      for(j in 1:4){
+        if(p+d+q+i+DD+j<=10){
+          model<-arima(x=data, order = c((p-1),d,(q-1)), seasonal = list(order=c((i-1),DD,(j-1)), period=per))
+          pval<-Box.test(model$residuals, lag=log(length(model$residuals)))
+          sse<-sum(model$residuals^2)
+          cat(p-1,d,q-1,i-1,DD,j-1,per, 'AIC=', model$aic, ' SSE=',sse,' p-VALUE=', pval$p.value,'\n')
+        }
+      }
+    }
+  }
+}
+```
+
+
+
+
+11. Time plot, ACF, PACF, Ljung-Box test of residuals
+
+```{r}
+m<-sarima(data,0,1,1,0,1,1,12)
+m
+```
+
+There is a systematic departure from linearity in QQ-plot which implies that residuals have a heavier tail compared to the Gaussian distribution. 
+
+
+p-values from Ljung-Box test are high meaning that there is no significant autocorrelation left in the residuals. 
+
+
+ACF shows no significant autocorrelation in the residuals. 
+
+
+There is no strong evidence against the whiteness of the residuals. 
+
+
+```{r}
+m$ttable
+```
+
+
+```{r}
+beta1 = m$ttable[1] 
+beta2 = m$ttable[2]
+
+m$fit$sigma2
+
+beta1
+beta2
+beta1*beta2
+
+
+pvalue1 = m$ttable[7]
+pvalue2 = m$ttable[8]
+pvalue1
+pvalue2
+
+
+```
+
+p-values are 0.0008 and 0.0028 for MA and seasonal MA coefficients, respectively. 
+The fact that they are both less than any reasonable significant level, both coefficients (terms) are significant. 
+
+
+
+$$
+SARIMA(0,1,1,0,1,1)_{12} \\
+(1-B)(1-B^{12})X_t = (1+\beta_1 B)(1+\beta_{12}B^{12})Z_t \\
+(1-B^{12}-B+B^{13})X_t = (1+\beta_{12}B^{12} + \beta_1 B + \beta_1 \beta_{12}B^{13} )Z_t \\
+X_t = (B+B^{12}-B^{13})X_t + (1  + \beta_1 B  +\beta_{12}B^{12} + \beta_1 \beta_{12}B^{13} )Z_t \\
+X_t = X_{t-1} + X_{t-12} - X_{t-13} + Z_t + \beta_1 Z_{t-1} + \beta_{12} Z_{t-12}  +  \beta_1 \beta_{12} Z_{t-13} \\
+
+$$
+
+
+
+```{r}
+model<- arima(x=data, order = c(0,1,1), seasonal = list(order=c(0,1,1), period=12))
+summary(model)
+```
+
+Forecast didn't work with sarima, only with arima model
+```{r}
+forecast(model)
+```
+
+```{r}
+plot(forecast(model))
+```
+
+```{r}
+a<-sarima.for(data,12,0,1,1,0,1,1,12)
+a
+plot.ts(c(data,a$pred), main='Monthly + Forecast', ylab='', col='blue', lwd=3)
+```
+
+point forecast for the number of accidental deaths in the March of 1979: 8315
+
+
