@@ -2805,3 +2805,602 @@ plot.ts(c(data,a$pred), main='Monthly + Forecast', ylab='', col='blue', lwd=3)
 point forecast for the number of accidental deaths in the March of 1979: 8315
 
 
+
+
+## Rain in London
+
+
+
+```{r}
+rm(list=ls(all=TRUE))
+rain.data <- scan("http://robjhyndman.com/tsdldata/hurst/precip1.dat",skip=1)
+rain.ts <- ts(rain.data, start=c(1813))
+```
+
+```{r}
+par( mfrow=c(1,2) )
+hist(rain.data, main="Annual London Rainfall 1813-1912",
+xlab="rainfall in inches")
+qqnorm(rain.data,main="Normal Plot of London Rainfall")
+qqline(rain.data)
+```
+
+
+
+```{r}
+plot.ts(rain.ts, main="Annual London Rainfall 1813-1912",
+xlab="year", ylab="rainfall in inches")
+acf(rain.ts, main="ACF: London Rainfall")
+```
+
+```{r}
+library(forecast)
+auto.arima(rain.ts)
+```
+
+
+```{r}
+alpha=.2 #increase alpha for more rapid decay
+forecast.values = NULL #establish array to store forecast values
+n = length(rain.data)
+#naive first forecast
+forecast.values [1] = rain.data[1]
+#loop to create all forecast values
+for( i in 1:n ) {
+forecast.values [i+1] = alpha*rain.data[i] + (1-alpha)* forecast.values [i]
+}
+paste("forecast for time",n+1," = ", forecast.values [n+1])
+```
+
+
+```{r}
+SSE=NULL
+n = length(rain.data)
+alpha.values = seq( .001, .999, by=0.001)
+number.alphas = length(alpha.values)
+for( k in 1:number.alphas ) {
+forecast.values=NULL
+alpha = alpha.values[k]
+forecast.values[1] = rain.data[1]
+for( i in 1:n ) {
+forecast.values[i+1] = alpha*rain.data[i] + (1-alpha)*forecast.values[i]
+}
+SSE[k] = sum( (rain.data - forecast.values[1:n])^2 )
+}
+plot(SSE~alpha.values, main="Optimal alpha value Minimizes SSE")
+```
+
+
+```{r}
+index.of.smallest.SSE = which.min(SSE) #returns position 24
+alpha.values[which.min(SSE)] #returns 0.024
+```
+
+```{r}
+alpha=.024 #increase alpha for more rapid decay
+forecast.values = NULL #establish array to store forecast values
+n = length(rain.data)
+#naive first forecast
+forecast.values [1] = rain.data[1]
+#loop to create all forecast values
+for( i in 1:n ) {
+forecast.values [i+1] = alpha*rain.data[i] + (1-alpha)* forecast.values [i]
+}
+paste("forecast for time",n+1," = ", forecast.values [n+1])
+```
+
+
+```{r}
+HoltWinters(rain.ts, beta=FALSE, gamma=FALSE)
+```
+
+
+
+
+## Simple Exponential Smoothing (SES)
+
+$$
+\frac{1}{\alpha}= \sum_{k=0}^\infty(1-\alpha)^k
+$$
+
+$$
+x^n_{n+h} = x^\text{time for which you actually have data}_\text{time for which you′d like a forecast}
+$$
+$$
+SES: x^n_{n+1} = \alpha x_n + (1-\alpha)x^{n-1}_{n}, \quad
+\text{start with }x^1_2 = x_1
+$$
+
+
+
+
+$$
+SES: \hat{x}_{n+1} = \alpha x_n + (1-\alpha)\hat{x}_{n}
+$$
+
+
+## Holt-Winters
+Exponential smoothing with trend and seasonality or Triple exponential smoothing
+
+* Levels, with parameter “alpha”, $\alpha$
+* Trend, with parameter “beta”, $\beta$
+* Seasonal Component , with parameter “gamma”, $\gamma$
+
+
+getting a new level by updating the old level (forecast) and including new information.
+new level = α ⋅ new information + (1 − α) ⋅ old level
+$$
+\hat{x}_{n+1} = \alpha x_n + (1-\alpha)\hat{x}_{n}
+$$
+
+Yesterday’s forecast plus a constant times the error in yesterday’s forecast
+$$
+\hat{x}_{n+1} = \hat{x}_{n} + \alpha (x_n - \hat{x}_{n})
+$$
+
+Level (l): smoothed (S) value of ts, t for time
+$$
+l_{t} = \alpha x_t + (1-\alpha)l_{t-1}
+$$
+
+
+$$
+\hat{x}_{n+1} = \hat{l}_{n} = \alpha x_n + (1-\alpha)\hat{x}_{n}
+$$
+
+(double exponential) forecast = smoothed value + correction including trend information
+
+The one-step-ahead equations for your forecast will look like
+
+$$
+\hat{x}_{n+1} = \text{level}_{n} + \text{trend}_{n}
+$$
+Smoothed value or level
+$$
+\text{level}_{n}  = \alpha \cdot  \text{new information} + (1-\alpha) (\text{old level} + \text{trend}) \\
+\text{level}_{n}  = \alpha \cdot  x_n + (1-\alpha) (\text{level}_{n-1} + \text{trend}_{n-1})
+$$
+
+Trend: weighted average of the current change in level and previous trend, 
+similarly to what we did for SES on time series values
+$$
+\text{trend}_{n-1} = \beta \cdot \text{new trend} + (1-\beta)\cdot\text{old trend} \\
+\text{trend}_{n}  = \beta \cdot (\text{level}_{n} - \text{level}_{n-1}) + (1-\beta) \text{trend}_{n-1}
+$$
+
+Initial levels and trends then we can proceed inductively
+$$
+\text{level}_1 = x_1, \quad \text{trend}_1 = x_2 − x_1
+$$
+
+
+```{r}
+#set up our transformed data and smoothing parameters
+data = money.data.ts
+N = length(data)
+alpha = 0.7
+beta = 0.5
+##prepare empty arrays so we can store values
+forecast = NULL
+level = NULL
+trend = NULL
+#initialize level and trend in a very simple way
+level[1] = data [1]
+trend[1] = data [2]- data [1]
+#initialize forecast to get started
+forecast[1] = data [1]
+forecast[2] = data [2]
+#loop to build forecasts
+for( n in 2:N ) {
+level[n] = alpha* data [n] +
+(1-alpha)*(level[n-1]+trend[n-1])
+trend[n] = beta*(level[n] - level[n-1]) +
+(1-beta)*trend[n-1]
+forecast[n+1] = level[n] + trend[n]
+}
+#display your calculated forecast values
+forecast[3:N]
+```
+
+```{r}
+#verify that we have recovered HoltWinters() output
+m = HoltWinters(data, alpha = 0.7, beta = 0.5, gamma = FALSE)
+m$fitted[,1]
+```
+
+
+
+```{r}
+plot(m, main="Holt Winters Fitting of Money Volume with Bogus Parameters")
+```
+
+```{r}
+m=HoltWinters(data, gamma = FALSE)
+plot(m, main="Holt Winters Fitting of Money Volume with Optimal Parameters")
+```
+
+
+
+## Airline data
+
+
+```{r}
+plot(AirPassengers)
+```
+
+
+```{r}
+plot(log10(AirPassengers))
+```
+
+
+* strong seasonality
+* trend
+* heteroscedastic, with increasing variability in later years (see first plot below)
+* transform log10(number of passengers): calmer looking plot with apparently additive seasonality
+
+We saw that SES essentially led us to naïve forecasting.
+
+$$
+\hat{x}_{n+1} = \alpha x_n = x_n
+$$
+
+```{r}
+m <- HoltWinters(x = log10(AirPassengers), beta = FALSE, gamma = FALSE)
+m
+
+
+m$SSE
+```
+
+
+
+```{r}
+hw <- HoltWinters(x = log10(AirPassengers))
+hw
+hw$SSE
+```
+
+
+```{r}
+# Jan 1961
+horizon = 1
+
+(level_144 = hw$coefficients[1])  #a
+(trend_144 = hw$coefficients[2])  #b
+(seasonal_144_1_12 = hw$coefficients[2+horizon])  # s1
+
+x144_1 = level_144 + horizon * trend_144 + seasonal_144_1_12
+names(x144_1) <- c('x144_1')
+x144_1
+
+```
+
+
+```{r}
+
+# Aug 1961
+horizon = 8
+
+(seasonal_144_8_12 = hw$coefficients[2+horizon])  # s8
+
+x144_8 = level_144 + horizon * trend_144 + seasonal_144_8_12
+names(x144_8) <- c('x144_8')
+x144_8
+
+```
+
+
+```{r}
+
+# Dez 1961
+horizon = 12
+
+(seasonal_144_12_12 = hw$coefficients[2+horizon])  # s12
+
+x144_12 = level_144 + horizon * trend_144 + seasonal_144_12_12
+names(x144_12) <- c('x144_12')
+x144_12
+
+```
+
+```{r}
+11%%10
+```
+
+
+
+```{r}
+
+# Mar 1962
+horizon = 15
+
+(seasonal_144_15_12 = hw$coefficients[2+horizon%%12])  # s3
+
+x144_15 = level_144 + horizon * trend_144 + seasonal_144_15_12
+names(x144_15) <- c('x144_15')
+x144_15
+
+```
+
+
+```{r}
+library(forecast)
+
+fcast <- forecast(hw,24)
+fcast
+
+```
+
+
+```{r}
+plot(fcast)
+```
+
+
+
+```{r}
+plot(AirPassengers)
+```
+
+
+```{r}
+hw <- HoltWinters(x = log(AirPassengers))
+fcast <- forecast(hw,24,lambda=0)
+plot(fcast)
+
+```
+
+
+
+## Lynx
+
+```{r}
+plot(lynx)
+```
+
+
+```{r}
+HoltWinters(x = lynx, beta = FALSE, gamma = FALSE)
+```
+
+
+
+## Austres
+
+```{r}
+plot(austres)
+```
+
+
+```{r}
+hw <- HoltWinters(austres, gamma=FALSE)
+hw
+
+```
+
+```{r}
+x_n = tail(austres,1)[1]
+alpha = hw$alpha
+beta = hw$beta
+h=1  # 1 quarter ahead
+
+level_n = hw$coefficients[1]  #a
+trend_n = hw$coefficients[2]  #b
+
+# level_n = alpha*x_n + (1-alpha)*(level_n_1+trend_n_1)
+# trend_n = beta *(level_n-level_n_1) + (1-beta) * trend_n_1
+
+x_n_h = level_n + h * trend_n
+names(x_n_h) <- paste0('x_n_',h)
+x_n_h
+```
+
+
+
+```{r}
+forecast(HoltWinters(austres, gamma=FALSE),1)
+```
+
+
+
+## Sunspots
+
+
+```{r}
+plot(sunspots)
+```
+
+```{r}
+hw <- HoltWinters(sunspots)
+hw
+```
+
+```{r}
+x_n = tail(sunspots,1)[1]
+alpha = hw$alpha
+beta = hw$beta
+h=4  # 1 quarter ahead
+
+level_n = hw$coefficients[1]  #a
+trend_n = hw$coefficients[2]  #b
+s_h = hw$coefficients[2+h]  #s1
+
+# level_n = alpha*x_n + (1-alpha)*(level_n_1+trend_n_1)
+# trend_n = beta *(level_n-level_n_1) + (1-beta) * trend_n_1
+
+x_n_h = level_n + h * trend_n + s_h
+names(x_n_h) <- paste0('x_n_',h)
+x_n_h
+```
+
+
+
+```{r}
+forecast(hw,20)
+```
+
+
+```{r}
+tail(sunspots)
+```
+
+
+```{r}
+fcast <- forecast(hw)
+plot(fcast)
+```
+
+
+
+```{r}
+
+library(lubridate)
+library(tidyverse)
+library(scales)
+#install.packages("ggfortify")
+library(ggfortify)
+
+# Convert pred from list to data frame object
+df1 <- fortify(fcast) %>% as_tibble()
+
+# Convert ts decimal time to Date class
+df1$Date <- as.Date(date_decimal(df1$Index), "%Y-%m", tz="UTC")
+str(df1)
+
+# Remove Index column and rename other columns
+# Select only data pts after 2017
+df1 <- df1 %>% 
+  select(-Index) %>% 
+  filter(Date >= as.Date("1983-01-01")) %>% 
+  rename("Low95" = "Lo 95",
+         "Low80" = "Lo 80",
+         "High95" = "Hi 95",
+         "High80" = "Hi 80",
+         "Forecast" = "Point Forecast")
+df1
+### Updated: To connect the gap between the Data & Forecast, 
+# assign the last non-NA row of Data column to the corresponding row of other columns
+lastNonNAinData <- max(which(complete.cases(df1$Data)))
+df1[lastNonNAinData, !(colnames(df1) %in% c("Data", "Fitted", "Date"))] <- df1$Data[lastNonNAinData]
+
+# Or: use [geom_segment](http://ggplot2.tidyverse.org/reference/geom_segment.html)
+
+plt1 <- ggplot(df1, aes(x = Date)) +   
+  ggtitle("Ticket amount") +
+  xlab("Time frame") + ylab("Quantity") +
+  geom_ribbon(aes(ymin = Low95, ymax = High95, fill = "95%")) +
+  geom_ribbon(aes(ymin = Low80, ymax = High80, fill = "80%")) +
+  geom_point(aes(y = Data, colour = "Data"), size = 4) +
+  geom_line(aes(y = Data, group = 1, colour = "Data"), 
+            linetype = "dotted", size = 0.75) +
+  geom_line(aes(y = Fitted, group = 2, colour = "Fitted"), size = 0.75) +
+  geom_line(aes(y = Forecast, group = 3, colour = "Forecast"), size = 0.75) +
+  scale_x_date(breaks = scales::pretty_breaks(), date_labels = "%b %Y") +
+  scale_colour_brewer(name = "Legend", type = "qual", palette = "Dark2") +
+  scale_fill_brewer(name = "Intervals") +
+  guides(colour = guide_legend(order = 1), fill = guide_legend(order = 2)) +
+  theme_bw(base_size = 14)
+plt1
+```
+
+
+
+## Additive and multiplicative
+
+Additive seasonality doesn’t care about the overall levels, 
+whereas multiplicative seasonality does. 
+
+A nice website to explore these differences is available from Nikolaos Kourentzes:
+http://www.forsoc.net/2014/11/11/can-you-identify-additive-and-multiplicative-seasonality/
+
+additive: January data add a constant to obtain the June projection
+multiplicative: January data mupltiply by a constant to obtain the June projection
+
+
+Additive seasonality
+$$
+\hat{x}_{n+h} = \text{level}_{n} + h\cdot\text{trend}_{n} + \text{seasonal}_{n+h-m}
+$$
+
+a one-step-ahead term called $\text{trend}_{n}$, we
+move into the future ℎ steps in the simplest possible way by multiplying $\text{trend}_{n}$ by the number of time lags h we wish to look into the future (i.e. distance travelled is the size of
+your step multiplied by the number of steps).
+
+
+Multiplicative seasonality
+$$
+\hat{x}_{n+h} = (\text{level}_{n} + h\cdot\text{trend}_{n})\cdot \text{seasonal}_{n+h-m}
+$$
+
+
+
+$$
+\text{greek letter} \cdot \text{this} + (1 − \text{greek letter}) \cdot \text{that}
+$$
+We will peer h steps into the future for a time series with seasonality of length m.
+* h = number of steps into the future for forecast
+* m = length of the season in your data
+
+
+
+## Forecast
+1. Smooth the Level
+weighted average of the seasonally adjusted level $x_n − s_{n−m}$ (we say we are
+deseasonalizing) with the non-seasonal forecast
+$$
+ \text{level}_{n}  = \alpha \cdot (x_n -  \text{seasonal}_{n-m} ) + (1-\alpha) \cdot(\text{level}_{n-1} + \text{trend}_{n-1})
+$$
+
+2. Smooth the Trend
+$$
+\text{trend}_{n}  = \beta \cdot (\text{level}_{n} - \text{level}_{n-1}) + (1-\beta)\cdot \text{trend}_{n-1}
+$$
+
+3. Smooth the Season
+$$
+\text{seasonal}_{n}  = \gamma \cdot (x_{n} - \text{level}_{n-1}) + (1-\gamma)\cdot \text{seasonal}_{n-m}
+$$
+
+4. Update the Forecast
+Additive seasonality
+$$
+\hat{x}_{n+h} = (\text{level}_{n} + h\cdot\text{trend}_{n}) + \text{seasonal}_{n+h-m}
+$$
+Multiplicative seasonality
+$$
+\hat{x}_{n+h} = (\text{level}_{n} + h\cdot\text{trend}_{n})\cdot \text{seasonal}_{n+h-m}
+$$
+Your software will find optimal values of α and β and γ .
+
+
+
+## Australian money
+
+```{r}
+#install.packages("devtools")
+#devtools::install_github("FinYang/tsdl")
+library(tsdl)
+
+money.data <- subset(
+  tsdl, description = "Volume of money, ABS definition m1. Feb 1960 – Dec 1994")
+money.data.ts <- money.data[[1]]
+#money.data.ts[162] = 22458  # NA value for July 1973
+money.data.ts[162] = ( money.data.ts[161] + money.data.ts[163] ) / 2
+
+#money.data.ts = ts(money.data[,2],start=c(1960,2) , frequency=12)
+#par(mfrow=c(3,1))
+plot(money.data.ts, main="Time Plot of Volume of Money")
+acf(money.data.ts, main="ACF of Volume of Money")
+acf(money.data.ts, type="partial", main="PACF of Volume of Money")
+
+```
+
+
+Slow decay in the ACF, given the obvious trend
+PACF seems to cut off very sharply
+
+
+## Datasets
+
+https://pkg.yangzhuoranyang.com/tsdl/articles/tsdl.html
